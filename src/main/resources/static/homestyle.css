@@ -1,0 +1,8 @@
+.form-control {
+    display: table-cell;
+    inline-size: auto;
+}
+.form-group label {
+    display: table-cell;
+    inline-size: auto;
+}
