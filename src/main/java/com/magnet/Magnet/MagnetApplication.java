@@ -27,6 +27,9 @@ public class MagnetApplication {
 	//result page from search
 	@GetMapping("/result")
 	public String result(@RequestParam(name="query", defaultValue="default") String query, Model model) {
+		//TO DO send query to query processor
+		//query processor return list of urls or filenames
+		
 		//return result page
 		model.addAttribute("query", query);
 		return "result";
