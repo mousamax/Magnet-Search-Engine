@@ -1,0 +1,39 @@
+   //main function
+    // public static void main(String[] args) throws JSONException, IOException{
+    //     //read the query file
+    //     String queryFile = args[0];
+    //     String queryFilePath = "./" + queryFile;
+    //     File queryFileObj = new File(queryFilePath);
+    //     BufferedReader queryFileReader = new BufferedReader(new FileReader(queryFileObj));
+    //     String queryLine = queryFileReader.readLine();
+    //     //read the inverted index file
+    //     String indexFile = args[1];
+    //     String indexFilePath = "./" + indexFile;
+    //     File indexFileObj = new File(indexFilePath);
+    //     BufferedReader indexFileReader = new BufferedReader(new FileReader(indexFileObj));
+    //     String indexLine = indexFileReader.readLine();
+    //     //read the stop words file
+    //     String stopWordsFile = args[2];
+    //     String stopWordsFilePath = "./" + stopWordsFile;
+    //     File stopWordsFileObj = new File(stopWordsFilePath);
+    //     BufferedReader stopWordsFileReader = new BufferedReader(new FileReader(stopWordsFileObj));
+    //     String stopWordsLine = stopWordsFileReader.readLine();
+    //     //read the document file
+    //     String documentFile = args[3];
+    //     String documentFilePath = "./" + documentFile;
+    //     File documentFileObj = new File(documentFilePath);
+    //     BufferedReader documentFileReader = new BufferedReader(new FileReader(documentFileObj));
+    //     String documentLine = documentFileReader.readLine();
+    //     //read the query file
+    //     String queryResultFile = args[4];
+    //     String queryResultFilePath = "./" + queryResultFile;
+    //     File queryResultFileObj = new File(queryResultFilePath);
+    //     BufferedWriter queryResultFileWriter = new BufferedWriter(new FileWriter(queryResultFileObj));
+    //     //read the query file
+    //     String queryResultFile2 = args[5];
+    //     String queryResultFilePath2 = "./" + queryResultFile2;
+    //     File queryResultFileObj2 = new File(queryResultFilePath2);
+    //     BufferedWriter queryResultFileWriter2 = new BufferedWriter(new FileWriter(queryResultFileObj2));
+    //     //read the query file
+    //     String queryResultFile3 = args[6];
+    // }
