@@ -1,14 +1,11 @@
 package com.magnet.Magnet;
 
-import org.netpreserve.urlcanon.Canonicalizer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URISyntaxException;
 
@@ -25,6 +22,14 @@ public class MagnetApplication {
 	public String home() {
 		//return greeting page
 		return "greeting";
+	}
+
+	//result page from search
+	@GetMapping("/result")
+	public String result(@RequestParam(name="query", defaultValue="default") String query, Model model) {
+		//return result page
+		model.addAttribute("query", query);
+		return "result";
 	}
 
 	@GetMapping("/normalize")
