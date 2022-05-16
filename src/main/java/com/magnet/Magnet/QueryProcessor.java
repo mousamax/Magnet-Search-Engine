@@ -1,24 +1,12 @@
 package com.magnet.Magnet;
 
-import java.util.HashMap;
-import java.util.Map;
-import org.tartarus.snowball.ext.PorterStemmer;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.*;
-import org.*;
-import org.json.JSONArray;
 import org.json.JSONException;
-//import org.javatuples.Pair;
 import org.json.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.tartarus.snowball.ext.PorterStemmer;
+import java.io.*;
+import java.text.ParseException;
+import java.util.*;
 
 
 public class QueryProcessor{

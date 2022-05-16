@@ -1,21 +1,13 @@
 package com.magnet.Magnet;
 
-import java.util.HashMap;
-import java.util.Map;
-import org.tartarus.snowball.ext.PorterStemmer;
-import org.jsoup.nodes.Document;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.jsoup.Jsoup;
+import org.tartarus.snowball.ext.PorterStemmer;
+
+import java.io.*;
+import java.util.*;
 
 public class Indexer {
 
