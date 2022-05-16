@@ -1,3 +1,5 @@
+package com.magnet.Magnet;
+
 import java.util.HashMap;
 import java.util.Map;
 import org.tartarus.snowball.ext.PorterStemmer;
