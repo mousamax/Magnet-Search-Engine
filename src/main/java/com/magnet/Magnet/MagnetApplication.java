@@ -30,9 +30,12 @@ public class MagnetApplication {
 	@GetMapping("/result")
 	public String result(@RequestParam(name = "query", defaultValue = "default") String query,
 						 @RequestParam(name = "pageNum", defaultValue = "1") int pageNum, Model model) {
-		// TO DO send query to query processor
+		//TODO Submit query to the database
+
+		// TODO send query to query processor
 		// query processor return list of urls or filenames
 
+		// TODO parse list of filenames to list of magnet links
 		SearchResult res1 = new SearchResult("https://www.google.com/",
 		"Google", "Google Search Engine");
 	
