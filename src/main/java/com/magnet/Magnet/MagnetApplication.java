@@ -28,7 +28,8 @@ public class MagnetApplication {
 
 	// result page from search
 	@GetMapping("/result")
-	public String result(@RequestParam(name = "query", defaultValue = "default") String query, Model model) {
+	public String result(@RequestParam(name = "query", defaultValue = "default") String query,
+						 @RequestParam(name = "pageNum", defaultValue = "1") int pageNum, Model model) {
 		// TO DO send query to query processor
 		// query processor return list of urls or filenames
 
@@ -40,23 +41,37 @@ public class MagnetApplication {
 
 		SearchResult res3 = new SearchResult("https://www.facebook.com/",
 		"Facebook", "Facebook");
+		SearchResult res4 = new SearchResult("https://www.facebook.com/",
+				"LinkedIN", "750 million+ members | Manage your professional identity. Build and engage with your professional network. Access knowledge, insights and opportunities.");
 
 		ArrayList<SearchResult> results = new ArrayList<SearchResult>();
-
-		results.add(res1);
-		results.add(res2);
-		results.add(res3);
-
-		
+		//loop 15 times
+		for (int i = 0; i < 15; i++) {
+			results.add(res1);
+			results.add(res2);
+			results.add(res3);
+			if (i == 11) {
+				results.add(res4);
+			}
+		}
 		// return result page
 		model.addAttribute("query", query);
-		model.addAttribute("res", res1);
-		model.addAttribute("size", results.size());
-		model.addAttribute("results", results);
-
+		// create list of page numbers to be displayed in the pagination 10 per page
+		int pageCount = results.size() / 10;
+		if (results.size() % 10 != 0) {
+			pageCount++;
+		}
+		ArrayList<Integer> pageNumbers = new ArrayList<Integer>();
+		for (int i = 1; i <= pageCount; i++) {
+			pageNumbers.add(i);
+		}
+		model.addAttribute("pageNumbers", pageNumbers);
+		model.addAttribute("currentPageNum", pageNum);
+		//send only 10 results per pageNum request
+		int end = Math.min(pageNum * 10, results.size());
+		model.addAttribute("results", results.subList(pageNum * 10 - 10, end));
 		return "result";
 	}
-
 
 	@GetMapping("/normalize")
 	public String hello(@RequestParam(value = "url", defaultValue = "https://mawdoo3.com/") String url, Model model)

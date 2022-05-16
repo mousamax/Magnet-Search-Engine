@@ -7,6 +7,8 @@
         integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="/result_style.css">
+    <!--- jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <title>Result</title>
 </head>
 
@@ -36,23 +38,29 @@
             </div>
         </div>
     </div>
-    <br/><br/>
 
-    <tr th:each="searchResult: ${results}">
-        <div th:text="${searchResult.title}" class = "title" /> <br/>
-        <div class = "url"> <a th:href="${searchResult.url}" th:text="${searchResult.url}" target="_blank"></a>
-        </div> <br/>
-        <div th:text="${searchResult.description}" class = "description" /> <br class="break"/>
-    </tr>
-
-
-
-
-
-
-    
+    <table border="0">
+        <tbody>
+        <tr th:each="searchResult: ${results}">
+            <div th:text="${searchResult.title}" class = "title" />
+            <div class = "url"> <a th:href="${searchResult.url}" th:text="${searchResult.url}" target="_blank"></a>
+            </div>
+            <div th:text="${searchResult.description}" class = "description" />
+        </tr>
+        </tbody>
+    </table>
 
 
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            <li th:each="number: ${pageNumbers}" class="page-item">
+                <a th:href="@{/result(pageNum = ${number})}" th:text="${number}" class="page-link"
+                   th:class="${number==currentPageNum} ? active"
+                ></a>
+            </li>
+        </ul>
+    </nav>
+    <script src="/result.js"></script>
 </body>
 
 </html>
