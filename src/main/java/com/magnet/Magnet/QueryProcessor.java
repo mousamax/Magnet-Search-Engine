@@ -14,10 +14,10 @@ public class QueryProcessor{
 
  
     public static void main(String[] args) throws JSONException, IOException, FileNotFoundException, ParseException, org.json.simple.parser.ParseException  {
-
-        QueryProcessing();
+        String query = "Computer the Universe in engineer Department";
+        QueryProcessing(query);
     }
-    public static ArrayList<String> QueryProcessing() throws IOException, JSONException, org.json.simple.parser.ParseException{
+    public static ArrayList<String> QueryProcessing(String query) throws IOException, JSONException, org.json.simple.parser.ParseException{
                 //read json file
                 Map<String, Map<String, Double>> mp = new HashMap<String, Map<String, Double>>();
                 //ArrayList<String> files = getHTMLFiles(new File("./"));
@@ -34,7 +34,7 @@ public class QueryProcessor{
                 mp = (Map<String, Map<String, Double>>) obj;
                 Map<String, Map<String, Double>> processedMap = new HashMap<String, Map<String, Double>>();
         
-                String query = "Computer the Universe in engineer Department";
+
                 System.out.println(query);
                 String[] queryArray = query.split(" ");
                 ArrayList<String> queryArrayStemmed = new ArrayList<String>();
