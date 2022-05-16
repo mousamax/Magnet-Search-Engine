@@ -118,9 +118,10 @@ public class Indexer {
         StringBuilder content = new StringBuilder(1024);
         String s = "";
         // First line is url
-        String url = br.readLine();
-        Document document = Jsoup.connect(url).get();
-        String title = document.title();
+        //String url = br.readLine();
+        //Document document = Jsoup.connect(url).get();
+        //String title = document.title();
+        String title = "TEMP";
 
         while ((s = br.readLine()) != null) {
             content.append(s.toLowerCase());
