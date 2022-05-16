@@ -1,0 +1,10 @@
+/*
+    Title
+*/
+.title {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 0.5em;
+    font-family: 'Roboto', sans-serif;
+    color: rgba(20, 89, 226, 0.862);
+}

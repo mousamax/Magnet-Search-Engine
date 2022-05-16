@@ -1,11 +1,24 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="/result_style.css">
     <title>Result</title>
 </head>
+
 <body>
-    <!-- show query -->
-    <p th:text="'Search results for: ' + ${query} " />
+   
+    <tr th:each="searchQuery: ${results}">
+        <td th:text="${searchQuery.title}" class = "title" /> <br/>
+    </tr>    
+
+
+
+
+
+    
+
+
 </body>
+
 </html>

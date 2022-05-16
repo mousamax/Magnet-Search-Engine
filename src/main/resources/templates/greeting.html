@@ -1,41 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <!--- import bootstrap css -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+        integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="/homestyle.css">
     <meta charset="UTF-8">
     <title>Magnet Search Engine</title>
 </head>
+
 <body>
-<div class="container">
-    <div class="row">
-        <div class="col-md-12">
-            <h1>Magnet Search Engine</h1>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Magnet Search Engine</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <form action="result" method="get">
+                    <div class="form-group">
+                        <label for="search">Search</label>
+                        <input type="text" class="form-control" id="search" name="query" placeholder="search query">
+                        <button type="submit" class="btn btn-primary search">
+                            <i class="fas fa-search"></i>
+                        </button>
+                        <!--- button for speech recognition with mic icon -->
+                        <button type="button" class="btn btn-primary" id="micbtn">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                    </div>
+                    <button type="submit" class="btn btn-default">Submit</button>
+                </form>
+            </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-md-12">
-            <form action="result" method="get">
-                <div class="form-group">
-                    <label for="search">Search</label>
-                    <input type="text" class="form-control" id="search" name="query" placeholder="search query">
-                    <button type="submit" class="btn btn-primary search">
-                        <i class="fas fa-search"></i>
-                    </button>
-                    <!--- button for speech recognition with mic icon -->
-                    <button type="button" class="btn btn-primary" id="micbtn">
-                        <i class="fas fa-microphone"></i>
-                    </button>
-                </div>
-                <button type="submit" class="btn btn-default">Submit</button>
-            </form>
-        </div>
-    </div>
-</div>
 
 
-<script src="/voice.js"></script>
+    <script src="/voice.js"></script>
 </body>
+
 </html>
