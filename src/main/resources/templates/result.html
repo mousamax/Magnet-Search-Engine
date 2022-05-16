@@ -40,11 +40,10 @@
 
     <tr th:each="searchResult: ${results}">
         <div th:text="${searchResult.title}" class = "title" /> <br/>
-        <div> th:text="${searchResult.url}" class = "url" </div> <br/>
+        <div class = "url"> <a th:href="${searchResult.url}" th:text="${searchResult.url}" target="_blank"></a>
+        </div> <br/>
         <div th:text="${searchResult.description}" class = "description" /> <br class="break"/>
     </tr>
-
-
 
 
 
