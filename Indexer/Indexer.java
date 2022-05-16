@@ -54,17 +54,13 @@ public class Indexer {
             Scanner sc1 = new Scanner(System.in);
             System.out.println("Enter the file name:");
             HTMLFileName = sc1.nextLine();
-            HTMLFileName = "Example.html";
+            
             sc1.close();
             String indexFileString = readFile("index.json");
-            // sc1.close();s
+            sc1.close();
             Map<String, Map<String, Double>> mp = parseJSON(indexFileString);
 
-            //print map
-            // for (Map.Entry<String, Map<String, Double>> entry : mp.entrySet()) {
-            //     System.out.println("Key: " + entry.getKey() + " Value: " + entry.getValue());
-            // }
- 
+        
             mp = readHTMLFile(HTMLFileName, stopWords, mp);
             writeToFile(convertToJSON(mp).toString(), "./index.json");
             System.out.println("--------------------------------");
