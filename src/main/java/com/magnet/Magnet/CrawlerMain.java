@@ -33,7 +33,8 @@ public class CrawlerMain {
         //scan user input
         java.util.Scanner scanner = new java.util.Scanner(System.in);
         //get the number of threads
-        int numOfThreads = scanner.nextInt();
+        int numOfThreads = Math.abs(scanner.nextInt());
+        numOfThreads = Math.min(numOfThreads, 10);//max is 10 threads
         while (visitedUrls.size() < 10) {
             int remaining = 10 - visitedUrls.size();
             if(urlsToBeCrawled.size() == 0) {
