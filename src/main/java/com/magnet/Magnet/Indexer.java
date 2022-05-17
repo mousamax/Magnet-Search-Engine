@@ -24,8 +24,15 @@ public class Indexer {
             System.out.println("\u001B[31m" + "Invalid choice. Please enter 1 or 2." + "\u001B[0m");
             choice = sc.nextInt();
         }
+        System.out.println(
+                "\u001B[35m" + "Are the HTML files in arabic or english ?\n1.Arabic\n2.English");
+        int langChoice = sc.nextInt();
+        while (langChoice != 1 && langChoice != 2) {
+            System.out.println("\u001B[31m" + "Invalid choice. Please enter 1 or 2." + "\u001B[0m");
+            langChoice = sc.nextInt();
+        }
 
-        Set<String> stopWords = loadStopwords();
+        Set<String> stopWords = loadStopwords(langChoice);
         if (choice == 1) {
 
             // Key: Term
@@ -47,23 +54,23 @@ public class Indexer {
                             + "\u001B[0m");
         } else {
             String HTMLFileName;
-            
-            //Read HTML file name from user
+
+            // Read HTML file name from user
             Scanner sc1 = new Scanner(System.in);
             System.out.println("Enter the file name:");
             HTMLFileName = sc1.nextLine();
             sc1.close();
-            
-            //Read the index.json file and save it in a string
+
+            // Read the index.json file and save it in a string
             String indexFileString = readFile("./indexer result/index.json");
 
-            //Parse the json file and save it in a map
+            // Parse the json file and save it in a map
             Map<String, Map<String, Double>> mp = parseJSON(indexFileString);
 
-            //Update the map
+            // Update the map
             mp = readHTMLFile(HTMLFileName, stopWords, mp);
 
-            //Write the new index.json
+            // Write the new index.json
             writeToFile(convertToJSON(mp).toString(), "index.json");
             System.out.println("--------------------------------");
             System.out.println(
@@ -378,10 +385,16 @@ public class Indexer {
         bw.close();
     }
 
-    public static Set<String> loadStopwords() throws IOException {
+    public static Set<String> loadStopwords(int lang) throws IOException {
 
-        // read stopwords from file
-        FileReader fr = new FileReader("./english stopwords/english_stopwords.txt");
+        // Read stopwords from file
+        FileReader fr;
+        if (lang == 1) {
+            fr = new FileReader("./arabic stopwords/arabic_stopwords.txt");
+        }
+        else {
+            fr = new FileReader("./english stopwords/english_stopwords.txt");
+        }
         BufferedReader br = new BufferedReader(fr);
         String s = "";
         Set<String> stopwordsSet = new HashSet<String>();
