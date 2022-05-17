@@ -24,7 +24,7 @@ public class CrawlerMain {
         dataAccess.getUrlsToBeCrawled(urlsToBeCrawled);
         // --------- dataAccess.getUrlsToBeCrawled(urlsToBeCrawled);
         //create array list of urls to be crawled to divide work among threads
-        String[] urlsToBeCrawledArray = {"https://mawdoo3.com"};
+        String[] urlsToBeCrawledArray = {"https://www.quora.com","https://edition.cnn.com","https://www.bbc.com"};
         if (urlsToBeCrawled.size() == 0) {//if cold start load the seed url
             urlsToBeCrawled.put(urlsToBeCrawledArray[0], true);
         }
