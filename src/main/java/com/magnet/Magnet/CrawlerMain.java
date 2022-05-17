@@ -3,7 +3,7 @@ package com.magnet.Magnet;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class Main {
+public class CrawlerMain {
 
     public static void main(String[] args)  {
         //ConcurrentHashMap to store normalizeUrl as key and page content as  value
