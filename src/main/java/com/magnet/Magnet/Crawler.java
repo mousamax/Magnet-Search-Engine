@@ -113,7 +113,7 @@ public class Crawler implements Runnable {
                 //create file writer
                 FileWriter fw = new FileWriter(file);
                 //write the html to the file
-                fw.write(url+"\n"+doc.html());
+                fw.write(doc.html());
                 //close the file writer
                 fw.close();
                 //add compact version of body text to compactPages
