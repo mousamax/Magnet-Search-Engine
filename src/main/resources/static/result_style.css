@@ -1,19 +1,23 @@
 .title {
-    font-size: 1.5em;
+    /* font-size: 1.5em; */
     font-weight: bold;
-    margin-bottom: 0.1em;
-    padding-left: 1em;
+    /* margin-bottom: 0.1em;
+    padding-left: 1em; */
     font-family: 'Roboto', sans-serif;
     color: rgba(20, 89, 226, 0.862);
 }
 
+.head {
+    color: white;
+    background-color: black
+}
 
 .url
 {
     font-size: 1.0em;
     font-weight: bold;
-    margin-bottom: 0.5em;
-    padding-left: 1em;
+    /* margin-bottom: 0.5em;
+    padding-left: 1em; */
     font-family: 'Roboto', sans-serif;
     color: rgba(13, 134, 4, 0.862);
 }
@@ -22,8 +26,13 @@
 {
     font-size: 1.0em;
     font-weight: bold;
-    margin-bottom: 1em;
-    padding-left: 1em;
+    /* margin-bottom: 1em;
+    padding-left: 1em; */
     font-family: 'Roboto', sans-serif;
     color: rgb(0, 0, 0);
+}
+
+
+.tb{
+    margin-left: 1em;
 }

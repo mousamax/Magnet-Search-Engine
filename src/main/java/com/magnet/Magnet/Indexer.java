@@ -29,7 +29,7 @@ public class Indexer {
             // Key: Term
             // Value: Map with: Key: filename , Value: Term Frequency
             Map<String, Map<String, Double>> mp = new HashMap<String, Map<String, Double>>();
-            ArrayList<String> files = getHTMLFiles(new File("./"));
+            ArrayList<String> files = getHTMLFiles(new File("./html_files"));
 
             int numberOfDocuments = files.size();
             System.out.println("\u001B[34m" + "Number of documents: " + numberOfDocuments + "\u001B[0m");
