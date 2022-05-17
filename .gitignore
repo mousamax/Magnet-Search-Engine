@@ -1,6 +1,9 @@
 # Compiled class file
 *.class
 
+# Html files folder #
+html_files/
+
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
