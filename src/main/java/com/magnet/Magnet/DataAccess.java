@@ -104,9 +104,7 @@ public class DataAccess {
             // Execute the query
             int count = st.executeUpdate(query);
         }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
+        catch (SQLException e) { System.out.println("ignored duplicate url"); }
     }
     // retrieve all the urls to be crawled from the database table "UrlsToBeCrawled"
     public void getUrlsToBeCrawled(ConcurrentHashMap<String, Boolean> urlsToBeCrawled) {

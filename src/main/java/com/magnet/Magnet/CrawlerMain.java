@@ -24,9 +24,11 @@ public class CrawlerMain {
         dataAccess.getUrlsToBeCrawled(urlsToBeCrawled);
         // --------- dataAccess.getUrlsToBeCrawled(urlsToBeCrawled);
         //create array list of urls to be crawled to divide work among threads
-        String[] urlsToBeCrawledArray = {"https://www.quora.com","https://edition.cnn.com","https://www.bbc.com"};
+        String[] urlsToBeCrawledArray = {"https://www.encyclopedia.com","https://edition.cnn.com","https://www.bbc.com"};
         if (urlsToBeCrawled.size() == 0) {//if cold start load the seed url
-            urlsToBeCrawled.put(urlsToBeCrawledArray[0], true);
+            for (String url : urlsToBeCrawledArray) {
+                urlsToBeCrawled.put(url, true);
+            }
         }
         // prompt the user to enter the number of threads
         System.out.println("Enter the number of threads: ");
@@ -35,8 +37,8 @@ public class CrawlerMain {
         //get the number of threads
         int numOfThreads = Math.abs(scanner.nextInt());
         numOfThreads = Math.min(numOfThreads, 10);//max is 10 threads
-        while (visitedUrls.size() < 10) {
-            int remaining = 10 - visitedUrls.size();
+        while (visitedUrls.size() < 500) {
+            int remaining = 500 - visitedUrls.size();
             if(urlsToBeCrawled.size() == 0) {
                 System.out.println("No more urls to be crawled");
                 break;
