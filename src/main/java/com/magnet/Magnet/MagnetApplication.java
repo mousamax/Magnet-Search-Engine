@@ -68,6 +68,7 @@ public class MagnetApplication {
 		for (int i = 1; i <= pageCount; i++) {
 			pageNumbers.add(i);
 		}
+
 		model.addAttribute("pageNumbers", pageNumbers);
 		model.addAttribute("currentPageNum", pageNum);
 		//send only 10 results per pageNum request
