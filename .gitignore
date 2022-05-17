@@ -2,7 +2,7 @@
 *.class
 
 # Html files folder #
-html_files/
+
 
 HELP.md
 target/
