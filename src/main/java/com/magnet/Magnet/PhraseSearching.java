@@ -63,10 +63,11 @@ public class PhraseSearching {
                 {
                     if(originalPhraseArray.contains(originalWord.getKey()))
                     {
+                        
                         for(Map.Entry<String, Double> HTMLdoc : originalWord.getValue().entrySet())
                         {
                             //processedMap.get(entry.getKey()).get(originalWord.getKey()).replace(HTMLdoc.getKey(), HTMLdoc.getValue() + 20);
-                            
+
                         }
                     }
                 }

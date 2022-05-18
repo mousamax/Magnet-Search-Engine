@@ -28,9 +28,15 @@ public class QueryProcessor{
                 
                 //final map containing the needed stemmed files that will be sent to the ranker
                 Map<String, Map<String, Map<String, Double>>> processedMap = new HashMap<String, Map<String, Map<String, Double>>>();
-        
+                
 
-                //System.out.println(query);
+                //------------------phrase searching-------------------------------------
+                Map<String, Map<String, Map<String, Double>>> phraseSearchingMap = new HashMap<String, Map<String, Map<String, Double>>>();
+               
+
+                //------------------end phrase searching-------------------------------------
+
+                System.out.println(query);
                 //each word in original query splitted 
                 String[] queryArray = query.split(" ");
                 //each word in original query after stemming and removing stop words
@@ -48,28 +54,38 @@ public class QueryProcessor{
                 //System.out.println(queryArrayStemmed);
 
                 ArrayList<String> files = new ArrayList<String>();
-                for(Map.Entry<String, Map<String, Map<String, Double>>> entry : mp.entrySet()){
+                Map<String, Integer> phraseDocuments = new HashMap<String, Integer>();
+                for(int i = 0; i < queryArrayStemmed.size();i++){
                     
-                    if(queryArrayStemmed.contains(entry.getKey())){
-                        processedMap.put(entry.getKey(), entry.getValue());
-                        for(Map.Entry<String, Map<String, Double>> originalWord : entry.getValue().entrySet())
-                        {
-                            if(originalQueryArray.contains(originalWord.getKey()))
-                            {
-                                for(Map.Entry<String, Double> HTMLdoc : originalWord.getValue().entrySet())
+                    if(mp.containsKey(queryArrayStemmed.get(i))){
+                        
+                        processedMap.put(queryArrayStemmed.get(i), mp.get(queryArrayStemmed.get(i)));
+                        if(mp.get(queryArrayStemmed.get(i)).containsKey(originalQueryArray.get(i))){
+                            for(Map.Entry<String, Double> HTMLdoc : mp.get(queryArrayStemmed.get(i)).get(originalQueryArray.get(i)).entrySet())
                                 {
+                                    //------------------phrase searching-------------------------------------
+                                    if(phraseDocuments.containsKey(HTMLdoc.getKey()))
+                                    {
+                                        phraseDocuments.replace(HTMLdoc.getKey(), phraseDocuments.get(HTMLdoc.getKey()) + 1);
+                                    }
+                                    else
+                                    {
+                                        phraseDocuments.put(HTMLdoc.getKey(), 1);
+                                    }
+                                    //------------------end phrase searching-------------------------------------
                                     files.add(HTMLdoc.getKey());
-                                    double val = 0.2;
-                                    //processedMap.get(entry.getKey()).get(originalWord.getKey()).replace(HTMLdoc.getKey(), HTMLdoc.getValue() + val);
+                                    
+                                    processedMap.get(queryArrayStemmed.get(i)).get(originalQueryArray.get(i)).replace(HTMLdoc.getKey(), HTMLdoc.getValue() + 20);
                                 }
-                            }
                         }
-                        //System.out.println(entry.getKey());
-                        //System.out.println(entry.getValue());
-                    } 
+                        // for(int j = 0; j < originalQueryArray.size();j++){
+                            
+                        // }
+                    }
                 }
-                //System.out.println(processedMap);
                 
+                System.out.println(processedMap);
+                System.out.println(phraseDocuments);
         
                 //writeToFile(convertToJSON(processedMap).toString(), "processed.json");
                
