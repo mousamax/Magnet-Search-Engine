@@ -24,7 +24,7 @@ public class RankerRunner implements Runnable {
 
   @Override
   public void run() {
-    // TODO Auto-generated method stub
+    // Auto-generated method stub
     DataAccess dataAccess = new DataAccess();
     // convert thread name to int
     int threadNum = Character.getNumericValue(Thread.currentThread().getName().charAt(0));
@@ -44,19 +44,9 @@ public class RankerRunner implements Runnable {
     }
     // print start and end of each thread
     System.out.println("Thread " + threadNum + ": " + start + " to " + end);
-    // for (int i = 0; i < numThreads; i++) {
-    // try {
     if (start < end) {
       dataAccess.addUrlsPopularity(urlsArray, popularitiesArray, start, end);
     }
-    // crawlWebPage(Arrays.copyOfRange(urlsArray, start, end));
-    // }
-    // catch (IOException e) {
-    // e.printStackTrace();
-    // } catch (URISyntaxException e) {
-    // e.printStackTrace();
-    // }
-    // }
   }
 
 }
