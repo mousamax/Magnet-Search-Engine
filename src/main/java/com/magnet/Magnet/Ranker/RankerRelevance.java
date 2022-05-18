@@ -25,18 +25,18 @@ public class RankerRelevance {
 
     // Map<String, Map<String, Double>> mp
     // * For testing purposes
-    Map<String, Map<String, Double>> mp = new LinkedHashMap<String, Map<String, Double>>();
-    Map<String, Double> temp = new LinkedHashMap<String, Double>();
-    temp.put("Example2.html", 0.2857142857142857);
-    temp.put("Example3.html", 1.25);
-    temp.put("Example.html", 2.2222222222222223);
-
-    mp.put("engine", temp);
-
-    Map<String, Double> temp2 = new LinkedHashMap<String, Double>();
-    temp2.put("Example.html", 2.0);
-    mp.put("engineer", temp2);
-    inputMap.put("engin", mp);
+    //Map<String, Map<String, Double>> mp = new LinkedHashMap<String, Map<String, Double>>();
+    //Map<String, Double> temp = new LinkedHashMap<String, Double>();
+//    temp.put("Example2.html", 0.2857142857142857);
+//    temp.put("Example3.html", 1.25);
+//    temp.put("Example.html", 2.2222222222222223);
+//
+//    mp.put("engine", temp);
+//
+//    Map<String, Double> temp2 = new LinkedHashMap<String, Double>();
+//    temp2.put("Example.html", 2.0);
+//    mp.put("engineer", temp2);
+//    inputMap.put("engin", mp);
 
     // * End of test
     DataAccess dataAccess = new DataAccess();
