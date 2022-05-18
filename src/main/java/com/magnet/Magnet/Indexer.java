@@ -124,7 +124,7 @@ public class Indexer {
         // Use Jsoup to parse the file
         Document doc = Jsoup.parse(input, "UTF-8", "");
         //Remove .html from the file name
-        String fileNameWithoutExtension = fileName.substring(0, fileName.length() - 5);
+        fileName = fileName.substring(0, fileName.length() - 5);
         // Save the title in a string
         String title = doc.title();
         // Save the body text in a string
