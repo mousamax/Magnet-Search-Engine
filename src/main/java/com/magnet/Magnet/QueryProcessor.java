@@ -110,9 +110,7 @@ public class QueryProcessor{
                 
                 System.out.println(processedMap);
                 System.out.println(DocumentsContainingPhrase);
-        
-                //writeToFile(convertToJSON(processedMap).toString(), "processed.json");
-               
+
                 return files;
     };
 
