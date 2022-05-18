@@ -36,6 +36,8 @@ public class Indexer {
 
         for (String fileName : files) {
             mp = readHTMLFile(fileName, stopWords, mp);
+            //mark file as indexed in database
+            dataAccess.markFileAsIndexed(fileName);
         }
 
         writeToFile(convertToJSON(mp).toString(), "index.json");
@@ -105,8 +107,6 @@ public class Indexer {
         // Calculate docLength, will be used to calculate the normalized TF
         Integer docLength = bodyWords.length + titleWords.length;
 
-        // Remove .html from file name
-        fileName = fileName.substring(0, fileName.length() - 5);
 
         // Loop on title words and add them to the map
         for (String word : titleWords) {

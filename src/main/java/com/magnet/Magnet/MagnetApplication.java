@@ -1,5 +1,6 @@
 package com.magnet.Magnet;
 
+import org.json.simple.parser.ParseException;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.stereotype.Controller;
@@ -7,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -29,7 +31,7 @@ public class MagnetApplication {
 	// result page from search
 	@GetMapping("/result")
 	public String result(@RequestParam(name = "query", defaultValue = "") String query,
-						 @RequestParam(name = "pageNum", defaultValue = "1") int pageNum, Model model) {
+						 @RequestParam(name = "pageNum", defaultValue = "1") int pageNum, Model model) throws IOException, ParseException {
 		//TODO Submit query to the database
 		DataAccess dataAccess = new DataAccess();
 		dataAccess.addQuery(query);
@@ -38,8 +40,8 @@ public class MagnetApplication {
 		
 
 		// TODO send query to query processor
+		ArrayList<String> fileNames = QueryProcessor.QueryProcessing(query);
 		// query processor return list of urls or filenames
-		ArrayList<String> fileNames = new ArrayList<>();
 		fileNames.add("00");
 		fileNames.add("10");
 		fileNames.add("20");

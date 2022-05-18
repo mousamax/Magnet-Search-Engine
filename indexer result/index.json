@@ -1,1 +1,89 @@
-{"engin":{"engineering":{"Example":0.47368421052631576,"Example3":0.625,"Example2":0.14285714285714285},"engineer":{"Example":0.15789473684210525}},"undergrad":{"undergrad":{"Example2":0.07142857142857142}},"test":{"test":{"Example":0.15789473684210525}},"nader":{"nader":{"Example3":0.125}},"cairo":{"cairo":{"Example":0.15789473684210525,"Example2":0.07142857142857142}},"dept":{"dept":{"Example":0.15789473684210525}},"lab":{"lab":{"Example":0.3157894736842105,"Example2":0.42857142857142855}},"univers":{"university":{"Example":0.15789473684210525,"Example2":0.07142857142857142},"universe":{"Example":0.15789473684210525}},"research":{"research":{"Example2":0.07142857142857142}},"home":{"home":{"Example2":0.07142857142857142}},"comput":{"computer":{"Example":0.15789473684210525,"Example2":0.07142857142857142},"computing":{"Example":0.15789473684210525}},"exampl":{"example":{"Example":0.15789473684210525,"Example3":0.375}},"dept.":{"dept.":{"Example2":0.07142857142857142}},"faculti":{"faculty":{"Example":0.15789473684210525,"Example2":0.07142857142857142}}}
+{
+    "engin": {
+        "engineering": {
+            "Example": 0.47368421052631576,
+            "Example3": 0.625,
+            "Example2": 0.14285714285714285
+        },
+        "engineer": {
+            "Example": 0.15789473684210525
+        }
+    },
+    "undergrad": {
+        "undergrad": {
+            "Example2": 0.07142857142857142
+        }
+    },
+    "test": {
+        "test": {
+            "Example": 0.15789473684210525
+        }
+    },
+    "nader": {
+        "nader": {
+            "Example3": 0.125
+        }
+    },
+    "cairo": {
+        "cairo": {
+            "Example": 0.15789473684210525,
+            "Example2": 0.07142857142857142
+        }
+    },
+    "dept": {
+        "dept": {
+            "Example": 0.15789473684210525
+        }
+    },
+    "lab": {
+        "lab": {
+            "Example": 0.3157894736842105,
+            "Example2": 0.42857142857142855
+        }
+    },
+    "univers": {
+        "university": {
+            "Example": 0.15789473684210525,
+            "Example2": 0.07142857142857142
+        },
+        "universe": {
+            "Example": 0.15789473684210525
+        }
+    },
+    "research": {
+        "research": {
+            "Example2": 0.07142857142857142
+        }
+    },
+    "home": {
+        "home": {
+            "Example2": 0.07142857142857142
+        }
+    },
+    "comput": {
+        "computer": {
+            "Example": 0.15789473684210525,
+            "Example2": 0.07142857142857142
+        },
+        "computing": {
+            "Example": 0.15789473684210525
+        }
+    },
+    "exampl": {
+        "example": {
+            "Example": 0.15789473684210525,
+            "Example3": 0.375
+        }
+    },
+    "dept.": {
+        "dept.": {
+            "Example2": 0.07142857142857142
+        }
+    },
+    "faculti": {
+        "faculty": {
+            "Example": 0.15789473684210525,
+            "Example2": 0.07142857142857142
+        }
+    }
+}
