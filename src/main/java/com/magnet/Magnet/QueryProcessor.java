@@ -47,9 +47,9 @@ public class QueryProcessor{
                 }
                 System.out.println(queryArrayStemmed);
 
-
+                ArrayList<String> files = new ArrayList<String>();
                 for(Map.Entry<String, Map<String, Map<String, Double>>> entry : mp.entrySet()){
-        
+                    
                     if(queryArrayStemmed.contains(entry.getKey())){
                         processedMap.put(entry.getKey(), entry.getValue());
                         for(Map.Entry<String, Map<String, Double>> originalWord : entry.getValue().entrySet())
@@ -58,6 +58,7 @@ public class QueryProcessor{
                             {
                                 for(Map.Entry<String, Double> HTMLdoc : originalWord.getValue().entrySet())
                                 {
+                                    files.add(HTMLdoc.getKey());
                                     processedMap.get(entry.getKey()).get(originalWord.getKey()).replace(HTMLdoc.getKey(), HTMLdoc.getValue() + 20);
                                 }
                             }
@@ -71,7 +72,7 @@ public class QueryProcessor{
                 
         
                 writeToFile(convertToJSON(processedMap).toString(), "processed.json");
-                ArrayList<String> files = new ArrayList<String>();
+               
                 return files;
     };
 
