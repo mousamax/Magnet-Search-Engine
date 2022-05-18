@@ -16,7 +16,7 @@ CREATE TABLE CrawlerData (
 Urls nvarchar(300) COLLATE Arabic_CI_AI_KS_WS NOT NULL  PRIMARY KEY,
 CompactPages nvarchar(300) COLLATE Arabic_CI_AI_KS_WS,
 Filename nvarchar(55),
-indexed nvarchar(1)
+indexed nvarchar(1) DEFAULT '0',
 );
 
 CREATE TABLE UrlsToBeCrawled (
