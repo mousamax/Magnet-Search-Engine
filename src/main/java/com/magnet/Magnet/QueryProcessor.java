@@ -1,5 +1,6 @@
 package com.magnet.Magnet;
 
+import com.magnet.Magnet.Ranker.RankerRelevance;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -21,7 +22,7 @@ public class QueryProcessor{
 		QueryProcessor.stopWords = QueryProcessor.loadStopwords();
         QueryProcessing(query);
     }
-    public static ArrayList<String> QueryProcessing(String query) throws IOException, JSONException, org.json.simple.parser.ParseException{
+    public static Object[] QueryProcessing(String query) throws IOException, JSONException, org.json.simple.parser.ParseException{
         query = query.toLowerCase();
                 //ArrayList<String> files = getHTMLFiles(new File("./"));
                 //final map containing the needed stemmed files that will be sent to the ranker
@@ -112,8 +113,8 @@ public class QueryProcessor{
                 System.out.println(DocumentsContainingPhrase);
                 System.out.println(HTMLdocuments_scores);
                 //writeToFile(convertToJSON(processedMap).toString(), "processed.json");
-               
-                return files;
+               //call ranker
+        return RankerRelevance.relevanceRanking(processedMap);
     };
 
     public static Map<String, Map<String, Map<String, Double>>> ToPhraseSearching(String query) throws IOException, JSONException, org.json.simple.parser.ParseException{

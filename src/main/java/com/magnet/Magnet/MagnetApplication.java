@@ -11,11 +11,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @SpringBootApplication
 @Controller
 public class MagnetApplication {
-	ArrayList<String> fileNames;
+	String[] fileNames;
 	ArrayList<SearchResult> results;
 	boolean loaded = false;
 	public static void main(String[] args) {
@@ -47,7 +48,9 @@ public class MagnetApplication {
 			//Get all queries
 			ArrayList<String> pastQueries = dataAccess.getQueries();
 			// TODO send query to query processor
-			fileNames = QueryProcessor.QueryProcessing(query);
+			//cast to string array
+			Object[] objectArray  = QueryProcessor.QueryProcessing(query);
+			fileNames = Arrays.copyOf(objectArray, objectArray.length, String[].class);
 			// query processor return list of urls or filenames
 			// TODO parse list of filenames to list of magnet links
 			SearchController searchController = new SearchController();
