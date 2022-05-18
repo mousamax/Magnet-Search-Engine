@@ -1,5 +1,8 @@
 package com.magnet.Magnet;
 
+import org.apache.tika.langdetect.optimaize.OptimaizeLangDetector;
+import org.apache.tika.language.detect.LanguageDetector;
+import org.apache.tika.language.detect.LanguageResult;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -17,7 +20,6 @@ public class Crawler implements Runnable {
     public static int numThreads;
     public static int numUrls;
     public static String[] urls;
-    public static ConcurrentHashMap<String, PageContent> crawledPages;
     public static ConcurrentHashMap<String, Boolean> visitedUrls;
     public static ConcurrentHashMap<String, Boolean> urlsToBeCrawled;
     // store compact version of the crawled pages to avoid storing the whole page content again
@@ -25,7 +27,9 @@ public class Crawler implements Runnable {
     // dataaccess object to access the database
     public static DataAccess dataAccess;
 
+    LanguageDetector detector;
     public void run() {
+        detector = new OptimaizeLangDetector().loadModels();
         // convert thread name to int
         int threadNum = Character.getNumericValue(Thread.currentThread().getName().charAt(0));
         // print out the thread name
@@ -45,7 +49,7 @@ public class Crawler implements Runnable {
             for (int i = 0; i < numThreads; i++) {
                 try {
                     if(start < end)
-                     crawlWebPage(Arrays.copyOfRange(urls, start, end), crawledPages, visitedUrls, urlsToBeCrawled, compactPages);
+                     crawlWebPage(Arrays.copyOfRange(urls, start, end), visitedUrls, urlsToBeCrawled, compactPages);
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (URISyntaxException e) {
@@ -55,7 +59,7 @@ public class Crawler implements Runnable {
         }
 
     //function to crawl a webpage pass visited urls and urls to be crawled
-    public void crawlWebPage(String[] urls, ConcurrentHashMap<String, PageContent> crawledPages,
+    public void crawlWebPage(String[] urls,
                                     ConcurrentHashMap<String, Boolean> visitedUrls,
                                     ConcurrentHashMap<String, Boolean> urlsToBeCrawled,
                                     ConcurrentHashMap<String,String> compactPages) throws IOException, URISyntaxException {
@@ -93,9 +97,17 @@ public class Crawler implements Runnable {
                     dataAccess.addVisitedUrl(url);
                     continue;
                 }
+                //chack doc html lang attribute with jsoup and if not english, skip
+                if(!languageDetection(doc)) {
+                    // print not english
+                    System.out.println(Thread.currentThread().getName() + ":Not English... " + url);
+                    //mark url as visited
+                    visitedUrls.put(url, true);
+                    // add url to database
+                    dataAccess.addVisitedUrl(url);
+                    continue;
+                }
                 String compactPage = UrlUtils.compactPage(doc.body().text());
-                // print compact page
-                System.out.println(Thread.currentThread().getName() + ":Compact Page: " + compactPage);
                 // check if compact version of body text is already in the compactPages
                 if (compactPages != null && compactPages.containsKey(compactPage)) {
                     //mark url as visited
@@ -122,28 +134,6 @@ public class Crawler implements Runnable {
                 visitedUrls.put(url, true);
                 // add url to database
                 dataAccess.addVisitedUrlandCompactPagesFilename(url, compactPage, fileName);
-                //create page content object
-                PageContent pageContent = new PageContent();
-                //add webpage title
-                pageContent.title = doc.title();
-                //add description from document object.
-                Elements meta = doc.select("meta[name=description]");
-                //check if description is not null
-                if (meta.attr("content") != null) {
-                    //add description
-                    pageContent.description = meta.attr("content");
-                }
-                //Get keywords from document object.
-                Elements metaKeywords = doc.select("meta[name=keywords]");
-                //check if keywords is not null
-                if (metaKeywords.attr("content") != null) {
-                    //add keywords
-                    pageContent.keywords = metaKeywords.attr("content");
-                }
-                //add body text
-                pageContent.body = doc.body().text();
-                //add page content to crawled pages
-                crawledPages.put(url, pageContent);
                 //get all hyperlinks from Document
                 Elements hyperlinks = doc.select("a[href]");
                 System.out.println( Thread.currentThread().getName() + ": Found " + hyperlinks.size() + " hyperlinks");
@@ -157,14 +147,32 @@ public class Crawler implements Runnable {
                     } catch (URISyntaxException e) { }
                     //check if link is not visited
                     if (!visitedUrls.containsKey(linkUrl)) {
-                            //add link to urls to be crawled
+                            //add link to urls to be crawled if not exists
+                        if(!urlsToBeCrawled.containsKey(linkUrl)) {
                             urlsToBeCrawled.put(linkUrl, true);
                             urlsTobeSentToDB.put(linkUrl, true);
+                        }
                     }
                 }
-                //add urls to database
-                dataAccess.addUrlsToBeCrawled(urlsTobeSentToDB);
+                //add urls to database if size is greater than 0
+                if(urlsTobeSentToDB.size() > 0)
+                    dataAccess.addUrlsToBeCrawled(urlsTobeSentToDB);
             }
         }
+    }
+    // language detection method for given Document
+    public boolean languageDetection(Document doc) {
+        Elements lang = doc.select("html[lang]");
+        if(lang.size() > 0) {
+            String langCode = lang.attr("lang");
+            if(!langCode.equals("en")) {
+                return false;
+            }
+        }
+        LanguageResult result = detector.detect(doc.body().text().substring(0, Math.min(doc.body().text().length(), 100)));
+        if(!result.getLanguage().equals("en")) {
+            return false;
+        }
+        return true;
     }
 }

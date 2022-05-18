@@ -10,9 +10,7 @@ public class DataAccess {
     private Connection connection;
     // microsoft driverClassName for sql server
     private static final String driverClassName = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-    // String hostName = "VMI103343";
     String hostName = "localhost";
-    // String hostName = "localhost\\MSSQLSERVER";
     String database = "MagnetSG";
 
     // obtain a connection to the database "MagnetSG"
@@ -79,28 +77,6 @@ public class DataAccess {
             e.printStackTrace();
         }
     }
-
-    // check if the url is already in the database table "CrawlerData"
-    public boolean isVisited(String url) {
-        try {
-            // Obtain a statement
-            Statement st = connection.createStatement();
-            String query = "SELECT * FROM CrawlerData WHERE Urls = ?";
-            PreparedStatement statement = connection.prepareStatement(query);
-            statement.setString(1, url);
-            ResultSet rs = statement.executeQuery();
-            // if the url is already in the database table "CrawlerData"
-            if (rs.next()) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
     // add UrlsToBeCrawled array to the database table "UrlsToBeCrawled"
     public void addUrlsToBeCrawled(ConcurrentHashMap<String, Boolean> urlsToBeCrawled) {
         try {
@@ -115,8 +91,7 @@ public class DataAccess {
             // Execute the query
             int count = st.executeUpdate(query);
         } catch (SQLException e) {
-            e.printStackTrace();
-        }
+            System.out.println("ignored duplicate url");}
     }
 
     // retrieve all the urls to be crawled from the database table "UrlsToBeCrawled"
@@ -216,6 +191,7 @@ public class DataAccess {
         }
     }
 
+
     // ? Check if we need to change the query as we will use the IDs
     public void getRelatedUrls(ConcurrentHashMap<String, List<String>> urlsPointingToMe,
             ConcurrentHashMap<String, Integer> urlsCountMap, ConcurrentHashMap<String, Double> urlPopularityMap,
@@ -255,6 +231,166 @@ public class DataAccess {
                     // So increment the numberOfUrlsIamPointingTo
                     urlsCountMap.put(rs.getString("Url"), numberOfUrlsIamPointingTo + 1);
                 }
+    //getNumOfCrawledFiles from the database table "CrawlerData" count "filename" column
+    public int getNumOfCrawledFiles() {
+        int num = 0;
+        try {
+            // Obtain a statement
+            Statement st = connection.createStatement();
+            String query = "Select COUNT(FILENAME) as count from CrawlerData;";
+            // Execute the query
+            ResultSet rs = st.executeQuery(query);
+            while (rs.next()) {
+                num = rs.getInt("count");
+            }
+        }
+        catch (SQLException e) {}
+        return num;
+    }
+    // add query to the database table "SearchData" for a given query
+    public void addQuery(String query) {
+        try {
+            // Obtain a statement
+            Statement st = connection.createStatement();
+            String query1 = "INSERT INTO SearchData (Query) VALUES (N'" + query + "');";
+            // Execute the query
+            int count = st.executeUpdate(query1);
+        } catch (SQLException e) {
+        }
+    }
+
+    // getUrl from the database table "CrawlerData" for a file name
+    public String getUrl(String fileName) {
+        try {
+            // Obtain a statement
+            Statement st = connection.createStatement();
+            String query = "SELECT Urls FROM CrawlerData WHERE FileName = N'" + fileName + "';";
+            // Execute the query
+            ResultSet rs = st.executeQuery(query);
+            // Store the compactPages in the ConcurrentHashMap
+            while (rs.next()) {
+                // remove spaces from the url
+                String url = rs.getString("Urls").replaceAll("\\s+", "");
+                return url;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    // --------------------------------------------------------------
+
+    // Check if StemTerm exists in database table "StemWords"
+    // and return its id
+    public int getStemTermId(String stemTerm) {
+        try {
+            // Obtain a statement
+            Statement st = connection.createStatement();
+            String query = "SELECT Id FROM StemWords WHERE StemTerm = N'" + stemTerm + "';";
+            // Execute the query
+            ResultSet rs = st.executeQuery(query);
+            // Store the compactPages in the ConcurrentHashMap
+            while (rs.next()) {
+                // remove spaces from the url
+                int id = rs.getInt("Id");
+                return id;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    // Check if originalWord exists in table "OriginalWords"
+    // and return its id
+    public int getOriginalWordId(String originalWord) {
+        try {
+            // Obtain a statement
+            Statement st = connection.createStatement();
+            String query = "SELECT Id FROM OriginalWords WHERE OriginalWord = N'" + originalWord + "';";
+            // Execute the query
+            ResultSet rs = st.executeQuery(query);
+            // Store the compactPages in the ConcurrentHashMap
+            while (rs.next()) {
+                // remove spaces from the url
+                int id = rs.getInt("Id");
+                return id;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    // Check if file exists in table "FilesAndScores"
+    // given a filename and originalWordId
+    // and return its id
+    public int getFileId(String fileName, int originalWordId) {
+        try {
+            // Obtain a statement
+            Statement st = connection.createStatement();
+            String query = "SELECT Id FROM FilesAndScores WHERE FileName = N'" + fileName + "' AND OriginalWordId = "
+                    + originalWordId + ";";
+            // Execute the query
+            ResultSet rs = st.executeQuery(query);
+            // Store the compactPages in the ConcurrentHashMap
+            while (rs.next()) {
+                // remove spaces from the url
+                int id = rs.getInt("Id");
+                return id;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    // Add StemTerm to table "StemWords" and return its id
+    public int addStemTerm(String stemTerm) {
+        try {
+            // Obtain a statement
+            Statement st = connection.createStatement();
+            String query = "INSERT INTO StemWords (StemTerm) VALUES (N'" + stemTerm + "');";
+            // Execute the query
+            int count = st.executeUpdate(query);
+            // Obtain a statement
+            Statement st1 = connection.createStatement();
+            String query1 = "SELECT Id FROM StemWords WHERE StemTerm = N'" + stemTerm + "';";
+            // Execute the query
+            ResultSet rs = st1.executeQuery(query1);
+            // Store the compactPages in the ConcurrentHashMap
+            while (rs.next()) {
+                // remove spaces from the url
+                int id = rs.getInt("Id");
+                return id;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    // Add originalWord to table "OriginalWords" and return its id
+    // given a stem id
+    public int addOriginalWord(String originalWord, int stemId) {
+        try {
+            // Obtain a statement
+            Statement st = connection.createStatement();
+            String query = "INSERT INTO OriginalWords (OriginalWord, StemId) VALUES (N'" + originalWord + "', " + stemId
+                    + ");";
+            // Execute the query
+            int count = st.executeUpdate(query);
+            // Obtain a statement
+            Statement st1 = connection.createStatement();
+            String query1 = "SELECT Id FROM OriginalWords WHERE OriginalWord = N'" + originalWord + "';";
+            // Execute the query
+            ResultSet rs = st1.executeQuery(query1);
+            // Store the compactPages in the ConcurrentHashMap
+            while (rs.next()) {
+                // remove spaces from the url
+                int id = rs.getInt("Id");
+                return id;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -302,13 +438,70 @@ public class DataAccess {
             // }
             // Execute the query
             int count = st.executeUpdate(query);
-        } catch (
+        } catch (SQLException e) {
+        return -1;
+    }
 
-        SQLException e) {
+    // Add fileName and score to table "FilesAndScores" and return its id
+    // given an originalWordId
+    public int addFile(String fileName, double score, int originalWordId) {
+        try {
+            // Obtain a statement
+            Statement st = connection.createStatement();
+            String query = "INSERT INTO FilesAndScores (FileName, Score, OriginalWordId) VALUES (N'" + fileName + "', "
+                    + score + ", " + originalWordId + ");";
+            // Execute the query
+            int count = st.executeUpdate(query);
+            // Obtain a statement
+            Statement st1 = connection.createStatement();
+            String query1 = "SELECT Id FROM FilesAndScores WHERE FileName = N'" + fileName + "';";
+            // Execute the query
+            ResultSet rs = st1.executeQuery(query1);
+            // Store the compactPages in the ConcurrentHashMap
+            while (rs.next()) {
+                // remove spaces from the url
+                int id = rs.getInt("Id");
+                return id;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+    // Get score from table "FilesAndScores"
+    // given a fileId
+    public double getScore(int fileId) {
+        try {
+            // Obtain a statement
+            Statement st = connection.createStatement();
+            String query = "SELECT Score FROM FilesAndScores WHERE Id = " + fileId + ";";
+            // Execute the query
+            ResultSet rs = st.executeQuery(query);
+            // Store the compactPages in the ConcurrentHashMap
+            while (rs.next()) {
+                // remove spaces from the url
+                double score = rs.getDouble("Score");
+                return score;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    // Update the score of a file in table "FilesAndScores"
+    // given a fileId and a score
+    public void updateFileScore(int fileId, double score) {
+        try {
+            // Obtain a statement
+            Statement st = connection.createStatement();
+            String query = "UPDATE FilesAndScores SET Score = " + score + " WHERE Id = " + fileId + ";";
+            // Execute the query
+            int count = st.executeUpdate(query);
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-
     // close the connection
     public void close() {
         try {

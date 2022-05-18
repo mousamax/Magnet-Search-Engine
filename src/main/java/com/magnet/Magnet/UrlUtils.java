@@ -8,6 +8,7 @@ import org.netpreserve.urlcanon.Canonicalizer;
 import org.netpreserve.urlcanon.ParsedUrl;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -37,7 +38,16 @@ public final class UrlUtils {
         // print the robots.txt URL
         //System.out.println("robots.txt URL: " + robotsURL);
         // download the robots.txt file with Jsoup with lines
-        Document doc = Jsoup.connect(robotsURL).get();
+        //create a document object
+        Document doc = null;
+        try {
+            doc = Jsoup.connect(url).get();
+        } catch (IOException e) {
+            System.out.println(Thread.currentThread().getName() + ":Can't Crawl... " + url);
+        }// catch malformed url
+        catch (Exception e) {
+            System.out.println(Thread.currentThread().getName() + ":Can't Crawl Malformed URL... " + url);
+        }
         String robotsTxt = doc.body().text();
         // for each two white space in the robots.txt file add a new line
         String[] lines = robotsTxt.split("\\s+");

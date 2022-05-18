@@ -28,36 +28,33 @@ public class MagnetApplication {
 
 	// result page from search
 	@GetMapping("/result")
-	public String result(@RequestParam(name = "query", defaultValue = "default") String query,
+	public String result(@RequestParam(name = "query", defaultValue = "") String query,
 						 @RequestParam(name = "pageNum", defaultValue = "1") int pageNum, Model model) {
 		//TODO Submit query to the database
-
+		DataAccess dataAccess = new DataAccess();
+		dataAccess.addQuery(query);
 		// TODO send query to query processor
 		// query processor return list of urls or filenames
-
+		ArrayList<String> fileNames = new ArrayList<>();
+		fileNames.add("00.html");
+		fileNames.add("10.html");
+		fileNames.add("20.html");
+		fileNames.add("31.html");
+		fileNames.add("312.html");
+		fileNames.add("436.html");
+		fileNames.add("572.html");
+		fileNames.add("601.html");
+		fileNames.add("692.html");
+		fileNames.add("711.html");
+		fileNames.add("771.html");
+		fileNames.add("875.html");
+		fileNames.add("913.html");
+		fileNames.add("972.html");
+		fileNames.add("1029.html");
 		// TODO parse list of filenames to list of magnet links
-		SearchResult res1 = new SearchResult("https://www.google.com/",
-		"Google", "Google Search Engine");
-	
-		SearchResult res2 = new SearchResult("https://www.youtube.com/",
-		"Youtube", "Youtube");
-
-		SearchResult res3 = new SearchResult("https://www.facebook.com/",
-		"Facebook", "Facebook");
-		SearchResult res4 = new SearchResult("https://www.facebook.com/",
-				"LinkedIN", "750 million+ members | Manage your professional identity. Build and engage with your professional network. Access knowledge, insights and opportunities.");
-
 		ArrayList<SearchResult> results = new ArrayList<SearchResult>();
-		//loop 15 times
-		for (int i = 0; i < 15; i++) {
-			results.add(res1);
-			results.add(res2);
-			results.add(res3);
-			if (i == 11) {
-				results.add(res4);
-			}
-		}
-		// return result page
+		SearchController searchController = new SearchController();
+		searchController.fillSearchResultList(results, fileNames);
 		model.addAttribute("query", query);
 		// create list of page numbers to be displayed in the pagination 10 per page
 		int pageCount = results.size() / 10;
@@ -84,17 +81,6 @@ public class MagnetApplication {
 		// add model attribute
 		model.addAttribute("url", url);
 		return "result";
-	}
-
-}
-
-class SearchResult {
-	public String url, title, description;
-
-	public SearchResult(String url, String title, String description) {
-		this.url = url;
-		this.title = title;
-		this.description = description;
 	}
 }
 
