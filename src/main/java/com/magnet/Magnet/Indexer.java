@@ -15,66 +15,35 @@ public class Indexer {
 
     public static void main(String[] args) throws JSONException, IOException, ParseException {
 
-        int choice;
         Scanner sc = new Scanner(System.in);
-        System.out
-                .println("\u001B[34m" + "Do you want to index all files or a single file?\n1.All files\n2.Single file");
-        choice = sc.nextInt();
-        while (choice != 1 && choice != 2) {
-            System.out.println("\u001B[31m" + "Invalid choice. Please enter 1 or 2." + "\u001B[0m");
-            choice = sc.nextInt();
-        }
+
         System.out.println(
                 "\u001B[35m" + "Are the HTML files in arabic or english ?\n1.Arabic\n2.English\n3.Both");
         sc.nextInt();
         Set<String> stopWords = loadStopwords();
-        if (choice == 1) {
 
-            // Key: Stemmed Term
-            // Value: Map with: Key: Original Word, Value: Map with:
-            // Key: File name, Value: Normalized TF * IDF
-            Map<String, Map<String, Map<String, Double>>> mp = new HashMap<String, Map<String, Map<String, Double>>>();
-            ArrayList<String> files = getHTMLFiles(new File("./html_files"));
+        // Key: Stemmed Term
+        // Value: Map with: Key: Original Word, Value: Map with:
+        // Key: File name, Value: Normalized TF * IDF
+        Map<String, Map<String, Map<String, Double>>> mp = new HashMap<String, Map<String, Map<String, Double>>>();
+        // ArrayList<String> files = getHTMLFiles(new File("./html_files"));
 
-            int numberOfDocuments = files.size();
-            System.out.println("\u001B[34m" + "Number of documents: " + numberOfDocuments + "\u001B[0m");
+        DataAccess dataAccess = new DataAccess();
+        ArrayList<String> files = dataAccess.getNonIndexedFiles();
 
-            for (String fileName : files) {
-                mp = readHTMLFile(fileName, stopWords, mp);
-            }
+        int numberOfDocuments = files.size();
+        System.out.println("\u001B[34m" + "Number of documents: " + numberOfDocuments + "\u001B[0m");
 
-            writeToFile(convertToJSON(mp).toString(), "index.json");
-            System.out.println("--------------------------------");
-            System.out.println(
-                    "\u001B[32m"
-                            + "Finished indexing all files\nOutput of the indexer is written in ./indexer/result/index.json"
-                            + "\u001B[0m");
-        } else {
-            String HTMLFileName;
-
-            // Read HTML file name from user
-            Scanner sc1 = new Scanner(System.in);
-            System.out.println("Enter the file name:");
-            HTMLFileName = sc1.nextLine();
-            sc1.close();
-
-            // Read the index.json file and save it in a string
-            String indexFileString = readFile("./indexer result/index.json");
-
-            // Parse the json file and save it in a map
-            Map<String, Map<String, Map<String, Double>>> mp = parseJSON(indexFileString);
-
-            // Update the map
-            mp = readHTMLFile(HTMLFileName, stopWords, mp);
-
-            // Write the new index.json
-            writeToFile(convertToJSON(mp).toString(), "index.json");
-            System.out.println("--------------------------------");
-            System.out.println(
-                    "\u001B[32m" + "Finished indexing " + HTMLFileName
-                            + "\nOutput of the indexer is written in index.json"
-                            + "\u001B[0m");
+        for (String fileName : files) {
+            mp = readHTMLFile(fileName, stopWords, mp);
         }
+
+        writeToFile(convertToJSON(mp).toString(), "index.json");
+        System.out.println("--------------------------------");
+        System.out.println(
+                "\u001B[32m"
+                        + "Finished indexing all files\nOutput of the indexer is written in ./indexer/result/index.json"
+                        + "\u001B[0m");
         sc.close();
     }
 
@@ -136,8 +105,7 @@ public class Indexer {
         // Calculate docLength, will be used to calculate the normalized TF
         Integer docLength = bodyWords.length + titleWords.length;
 
-
-        //Remove .html from file name
+        // Remove .html from file name
         fileName = fileName.substring(0, fileName.length() - 5);
 
         // Loop on title words and add them to the map
@@ -188,7 +156,7 @@ public class Indexer {
                     originalWordMap.put(word, fileMap);
                 }
             } else {
-                
+
                 // mp does not contain the stemmed term
                 // Add the stemmed term and original term and filename and term frequency
                 Map<String, Double> fileMap = new HashMap<String, Double>();

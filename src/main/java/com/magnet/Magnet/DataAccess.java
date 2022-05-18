@@ -234,6 +234,24 @@ public class DataAccess {
         }
     }
 
+    //get all non-indexed files from table "CrawlerData"
+    //return an array list
+    public ArrayList<String> getNonIndexedFiles() {
+        ArrayList<String> nonIndexedFiles = new ArrayList<String>();
+        try {
+            // Obtain a statement
+            Statement st = connection.createStatement();
+            String query = "SELECT FILENAME FROM CrawlerData WHERE INDEXED = 0;";
+            // Execute the query
+            ResultSet rs = st.executeQuery(query);
+            while (rs.next()) {
+                nonIndexedFiles.add(rs.getString("FILENAME"));
+            }
+        } catch (SQLException e) {
+        }
+        return nonIndexedFiles;
+    }
+
     //Select all from the database table "SearchData"
     //return in a list
     public ArrayList<String> getQueries() {
