@@ -26,13 +26,7 @@ public class Indexer {
         }
         System.out.println(
                 "\u001B[35m" + "Are the HTML files in arabic or english ?\n1.Arabic\n2.English");
-        int langChoice = sc.nextInt();
-        while (langChoice != 1 && langChoice != 2) {
-            System.out.println("\u001B[31m" + "Invalid choice. Please enter 1 or 2." + "\u001B[0m");
-            langChoice = sc.nextInt();
-        }
-
-        Set<String> stopWords = loadStopwords(langChoice);
+        Set<String> stopWords = loadStopwords();
         if (choice == 1) {
 
             // Key: Term
@@ -141,10 +135,10 @@ public class Indexer {
 
         // Loop on title words and add them to the map
         for (String word : titleWords) {
-            
-            //Convert word to lowercase
+
+            // Convert word to lowercase
             word = word.toLowerCase();
-            
+
             // Stemming
             word = stemming(word);
 
@@ -190,10 +184,10 @@ public class Indexer {
 
         // Loop on body words and add them to the map
         for (String word : bodyWords) {
-            
-            //Convert word to lowercase
+
+            // Convert word to lowercase
             word = word.toLowerCase();
-            
+
             // Stemming
             word = stemming(word);
 
@@ -393,23 +387,27 @@ public class Indexer {
         bw.close();
     }
 
-    public static Set<String> loadStopwords(int lang) throws IOException {
+    public static Set<String> loadStopwords() throws IOException {
 
         // Read stopwords from file
-        FileReader fr;
-        if (lang == 1) {
-            fr = new FileReader("./arabic stopwords/arabic_stopwords.txt");
-        }
-        else {
-            fr = new FileReader("./english stopwords/english_stopwords.txt");
-        }
-        BufferedReader br = new BufferedReader(fr);
+        FileReader frAr = new FileReader("./arabic stopwords/arabic_stopwords.txt");
+
+        BufferedReader brAr = new BufferedReader(frAr);
         String s = "";
         Set<String> stopwordsSet = new HashSet<String>();
-        while ((s = br.readLine()) != null) {
+        while ((s = brAr.readLine()) != null) {
             stopwordsSet.add(s);
         }
-        br.close();
+
+        FileReader frEn = new FileReader("./english stopwords/english_stopwords.txt");
+        BufferedReader brEn = new BufferedReader(frEn);
+
+        while ((s = brEn.readLine()) != null) {
+            stopwordsSet.add(s);
+        }
+
+        brAr.close();
+        brEn.close();
 
         stopwordsSet.add("*");
         stopwordsSet.add("/");
@@ -421,7 +419,6 @@ public class Indexer {
         stopwordsSet.add("!");
         stopwordsSet.add("&");
         stopwordsSet.add("-");
-
 
         return stopwordsSet;
     }
