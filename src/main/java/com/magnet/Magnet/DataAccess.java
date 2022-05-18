@@ -70,27 +70,6 @@ public class DataAccess {
             e.printStackTrace();
         }
     }
-    // check if the url is already in the database table "CrawlerData"
-    public boolean isVisited(String url) {
-        try {
-            // Obtain a statement
-            Statement st = connection.createStatement();
-            String query = "SELECT * FROM CrawlerData WHERE Urls = ?";
-            PreparedStatement statement = connection.prepareStatement(query);
-            statement.setString(1, url);
-            ResultSet rs = statement.executeQuery();
-            // if the url is already in the database table "CrawlerData"
-            if (rs.next()) {
-                return true;
-            }
-            else {
-                return false;
-            }
-            } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
     // add UrlsToBeCrawled array to the database table "UrlsToBeCrawled"
     public void addUrlsToBeCrawled(ConcurrentHashMap<String, Boolean> urlsToBeCrawled) {
         try {
