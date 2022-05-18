@@ -9,7 +9,6 @@ public class CrawlerMain {
         //ConcurrentHashMap to store normalizeUrl as key and page content as  value
         //ConcurrentHashMap is more efficient than hashtable but not thread safe as it is not synchronized
         //,but we don't care if two threads access the same key at the same time
-        ConcurrentHashMap<String, PageContent> crawledPages = new ConcurrentHashMap<>();
         //ConcurrentHashMap for visited urls
         ConcurrentHashMap<String, Boolean> visitedUrls = new ConcurrentHashMap<>();
         //ConcurrentHashMap for urls to be crawled
@@ -22,9 +21,12 @@ public class CrawlerMain {
         dataAccess.getUrlsAndCompactPages(visitedUrls, compactPages);
         // -------- load urlsToBeCrawled from database --------
         dataAccess.getUrlsToBeCrawled(urlsToBeCrawled);
-        // --------- dataAccess.getUrlsToBeCrawled(urlsToBeCrawled);
+        // get number of crawled files
+        int numOfCrawledFiles = dataAccess.getNumOfCrawledFiles();
+        //print the number of crawled files
+        System.out.println("Number of crawled files: " + numOfCrawledFiles);
         //create array list of urls to be crawled to divide work among threads
-        String[] urlsToBeCrawledArray = {"https://www.encyclopedia.com","https://edition.cnn.com","https://www.bbc.com"};
+        String[] urlsToBeCrawledArray = {"https://www.bbc.com/mundo/topics/ckdxnw959n7t"};// "https://www.encyclopedia.com","https://edition.cnn.com","https://www.bbc.com"};
         if (urlsToBeCrawled.size() == 0) {//if cold start load the seed url
             for (String url : urlsToBeCrawledArray) {
                 urlsToBeCrawled.put(url, true);
@@ -36,9 +38,13 @@ public class CrawlerMain {
         java.util.Scanner scanner = new java.util.Scanner(System.in);
         //get the number of threads
         int numOfThreads = Math.abs(scanner.nextInt());
+        System.out.println("How many pages to crawl: ");
+        java.util.Scanner scanner1 = new java.util.Scanner(System.in);
+        int requestedPages = scanner1.nextInt();
         numOfThreads = Math.min(numOfThreads, 10);//max is 10 threads
-        while (visitedUrls.size() < 500) {
-            int remaining = 500 - visitedUrls.size();
+        while (numOfCrawledFiles < requestedPages) {
+            numOfCrawledFiles = dataAccess.getNumOfCrawledFiles();
+            int remaining = requestedPages - numOfCrawledFiles;
             if(urlsToBeCrawled.size() == 0) {
                 System.out.println("No more urls to be crawled");
                 break;
@@ -59,7 +65,6 @@ public class CrawlerMain {
             //print numUrls
             System.out.println("numUrls: " + Crawler.numUrls);
             Crawler.urlsToBeCrawled = urlsToBeCrawled;
-            Crawler.crawledPages = crawledPages;
             Crawler.visitedUrls = visitedUrls;
             Crawler.compactPages = compactPages;
             Crawler.dataAccess = dataAccess;

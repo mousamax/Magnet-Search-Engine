@@ -179,6 +179,22 @@ public class DataAccess {
             e.printStackTrace();
         }
     }
+    //getNumOfCrawledFiles from the database table "CrawlerData" count "filename" column
+    public int getNumOfCrawledFiles() {
+        int num = 0;
+        try {
+            // Obtain a statement
+            Statement st = connection.createStatement();
+            String query = "Select COUNT(FILENAME) as count from CrawlerData;";
+            // Execute the query
+            ResultSet rs = st.executeQuery(query);
+            while (rs.next()) {
+                num = rs.getInt("count");
+            }
+        }
+        catch (SQLException e) {}
+        return num;
+    }
     // add query to the database table "SearchData" for a given query
     public void addQuery(String query) {
         try {
