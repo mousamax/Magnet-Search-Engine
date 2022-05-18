@@ -101,8 +101,6 @@ public class DataAccess {
             }
             // Execute the query
             int count = st.executeUpdate(queryTobeCrawled);
-            //print the number of rows affected
-            System.out.println("Number of rows affected queryTobeCrawled: " + count);
             Statement st2 = connection.createStatement();
             int count2 = st2.executeUpdate(queryToHyperLinks);
         } catch (SQLException e) {
@@ -138,8 +136,6 @@ public class DataAccess {
             String query = "DELETE FROM UrlsToBeCrawled;";
             // Execute the query
             int count = st.executeUpdate(query);
-            //print the number of rows affected
-            System.out.println("rows affected deleteUrlsToBeCrawled: " + count);
         } catch (SQLException e) {
             e.printStackTrace();
         }

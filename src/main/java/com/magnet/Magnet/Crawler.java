@@ -65,6 +65,7 @@ public class Crawler implements Runnable {
                                     ConcurrentHashMap<String,String> compactPages) throws IOException, URISyntaxException {
         //foreach url in urls to be crawled
         for (String url : urls) {
+            try {
             //if url visited, this may happen if the program interrupted and started the crawling list again
             if (!visitedUrls.containsKey(url)) {
                 System.out.println(Thread.currentThread().getName() + ":Crawling... " + url);
@@ -155,6 +156,9 @@ public class Crawler implements Runnable {
                     }
                 }
                 dataAccess.addUrlsToBeCrawled(urlsTobeSentToDB, url);
+            }
+            } catch (Exception e) {
+                continue;
             }
         }
     }

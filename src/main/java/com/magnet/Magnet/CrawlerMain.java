@@ -26,7 +26,7 @@ public class CrawlerMain {
         //print the number of crawled files
         System.out.println("Number of crawled files: " + numOfCrawledFiles);
         //create array list of urls to be crawled to divide work among threads
-        String[] urlsToBeCrawledArray = {"https://edition.cnn.com","https://www.bbc.com","https://www.encyclopedia.com"};
+        String[] urlsToBeCrawledArray = {"https://edition.cnn.com","https://www.goal.com/en","https://www.bbc.com","https://www.encyclopedia.com"};
         if (urlsToBeCrawled.size() == 0) {//if cold start load the seed url
             for (String url : urlsToBeCrawledArray) {
                 urlsToBeCrawled.put(url, true);
