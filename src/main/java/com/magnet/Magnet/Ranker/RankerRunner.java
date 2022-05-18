@@ -1,8 +1,5 @@
 package com.magnet.Magnet.Ranker;
 
-// import java.io.IOException;
-// import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.magnet.Magnet.DataAccess;
@@ -10,14 +7,12 @@ import com.magnet.Magnet.DataAccess;
 public class RankerRunner implements Runnable {
   private int numThreads;
   private int numUrls;
-  private ConcurrentHashMap<String, Double> urlPopularityMap;
   private String[] urlsArray;
   private Double[] popularitiesArray;
 
   public RankerRunner(int threadsNum, int urlsNum, ConcurrentHashMap<String, Double> urlPopularityMap) {
     this.numThreads = threadsNum;
     this.numUrls = urlsNum;
-    this.urlPopularityMap = urlPopularityMap;
     urlsArray = urlPopularityMap.keySet().toArray(new String[0]);
     popularitiesArray = urlPopularityMap.values().toArray(new Double[0]);
   }

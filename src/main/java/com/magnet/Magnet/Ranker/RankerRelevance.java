@@ -7,57 +7,82 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.magnet.Magnet.DataAccess;
+
 public class RankerRelevance {
   public static void main(String[] args) {
     // * It should be LinkedHashMap
-    Map<String, Map<String, Double>> mp = new LinkedHashMap<String, Map<String, Double>>();
-    relevanceRanking(mp);
+    Map<String, Map<String, Map<String, Double>>> inputMap = new LinkedHashMap<String, Map<String, Map<String, Double>>>();
+
+    // Map<String, Map<String, Double>> mp = new LinkedHashMap<String, Map<String,
+    // Double>>();
+    relevanceRanking(inputMap);
+    // relevanceRanking(mp);
   }
 
-  public static Object[] relevanceRanking(Map<String, Map<String, Double>> mp) {
+  public static Object[] relevanceRanking(Map<String, Map<String, Map<String, Double>>> inputMap) {
+    // Map<String, Map<String, Map<String, Double>>>
+
+    // Map<String, Map<String, Double>> mp
     // * For testing purposes
+    Map<String, Map<String, Double>> mp = new LinkedHashMap<String, Map<String, Double>>();
     Map<String, Double> temp = new LinkedHashMap<String, Double>();
-    temp.put("Example3.html", 0.2);
-    temp.put("Example2.html", 1.2);
-    temp.put("Example.html", 1.1);
-    mp.put("engin", temp);
+    temp.put("Example2.html", 0.2857142857142857);
+    temp.put("Example3.html", 1.25);
+    temp.put("Example.html", 2.2222222222222223);
+
+    mp.put("engine", temp);
 
     Map<String, Double> temp2 = new LinkedHashMap<String, Double>();
-    temp.put("Example4.html", 1.2);
-    temp2.put("Example2.html", 2.2);
-    temp2.put("Example3.html", 2.1);
-    mp.put("Dept", temp2);
-    // * For testing purposes
+    temp2.put("Example.html", 2.0);
+    mp.put("engineer", temp2);
+    inputMap.put("engin", mp);
 
+    // * End of test
+    DataAccess dataAccess = new DataAccess();
+    // Create a map of fileNames and popularity
+    LinkedHashMap<String, Double> filenamePopularityMap = new LinkedHashMap<String, Double>();
+    dataAccess.getFilenameWithPopularity(filenamePopularityMap);
     // Create a map of fileNames and list of words inside it
     Map<String, List<String>> fileNamesMap = new LinkedHashMap<String, List<String>>();
     Map<String, Double> fileNameRelevanceMap = new LinkedHashMap<String, Double>();
     // Loop on the given map
-    for (Map.Entry<String, Map<String, Double>> word : mp.entrySet()) {
-      for (Map.Entry<String, Double> file : word.getValue().entrySet()) {
-        // System.out.println(file);
-        // Getting a list of words in each file
-        List<String> wordsList = fileNamesMap.get(file.getKey());
-        if (wordsList == null) {
-          // Did not find the fileName
-          // * Stream.collect(Collectors.toList()); This makes the list modifiable
-          // Create a list and add the to the map with fileName as the key
-          wordsList = Stream.of(word.getKey()).collect(Collectors.toList());
-          fileNamesMap.put(file.getKey(), wordsList);
-          // Add the TF/IDF to the fileNameRelevanceMap
-          fileNameRelevanceMap.put(file.getKey(), file.getValue());
-        } else {
-          // Found the fileName
-          // So add the word to its wordsList
-          wordsList.add(word.getKey());
-          Double previousRelevance = fileNameRelevanceMap.get(file.getKey());
-          fileNameRelevanceMap.put(file.getKey(), previousRelevance + file.getValue());
+    for (Map.Entry<String, Map<String, Map<String, Double>>> stemWord : inputMap.entrySet()) {
+      // System.out.println(stemWord.getKey());
+      // System.out.println(stemWord.getValue());
+      for (Map.Entry<String, Map<String, Double>> unstemmedWord : stemWord.getValue().entrySet()) {
+        for (Map.Entry<String, Double> file : unstemmedWord.getValue().entrySet()) {
+          // System.out.println(file);
+          // Getting a list of words in each file
+          List<String> wordsList = fileNamesMap.get(file.getKey());
+          if (wordsList == null) {
+            // Did not find the fileName
+            // * Stream.collect(Collectors.toList()); This makes the list modifiable
+            // Create a list and add the to the map with fileName as the key
+            wordsList = Stream.of(unstemmedWord.getKey()).collect(Collectors.toList());
+            fileNamesMap.put(file.getKey(), wordsList);
+            // Add the TF/IDF to the fileNameRelevanceMap
+            fileNameRelevanceMap.put(file.getKey(), file.getValue());
+          } else {
+            // Found the fileName
+            // So add the unstemmedWord to its wordsList
+            wordsList.add(unstemmedWord.getKey());
+            Double previousRelevance = fileNameRelevanceMap.get(file.getKey());
+            fileNameRelevanceMap.put(file.getKey(), previousRelevance + file.getValue());
+          }
         }
       }
     }
-    // TODO Loop on relevanceMap and add url popularity
 
-    
+    // Loop on relevanceMap and add url popularity
+    for (Map.Entry<String, Double> file : fileNameRelevanceMap.entrySet()) {
+      Double myPopularity = filenamePopularityMap.get(file.getKey());
+      // It won't be null but to prevent
+      if (myPopularity != null) {
+        fileNameRelevanceMap.put(file.getKey(), file.getValue() + myPopularity);
+      }
+    }
+
     // System.out.println("\n----------PRINTING MAP OF FILE NAMES-------\n");
     // System.out.println(fileNamesMap);
     // System.out.println("\n----------PRINTING fileNameRelevanceMap-------");

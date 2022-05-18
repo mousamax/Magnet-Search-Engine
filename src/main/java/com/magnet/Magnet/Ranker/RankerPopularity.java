@@ -71,7 +71,7 @@ public class RankerPopularity {
                 // Add the damping factor add the end
                 if (constIteration - 1 == i) {
                     calculatedPopu = (((1 - dampingFactor) / totalLinksNum) + dampingFactor * calculatedPopu)
-                            * totalLinksNum * 100;
+                            * totalLinksNum * 10;
                 }
                 tempMap.put(url.getKey(), calculatedPopu);
             }
