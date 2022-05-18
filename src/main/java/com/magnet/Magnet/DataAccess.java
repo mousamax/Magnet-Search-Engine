@@ -7,7 +7,7 @@ public class DataAccess {
     private Connection connection;
     //microsoft driverClassName for sql server
     private static final String driverClassName = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-    String hostName = "localhost\\MSSQLSERVER";
+    String hostName = "localhost";
     String database = "MagnetSG";
     // obtain a connection to the database "MagnetSG"
     public DataAccess() {
