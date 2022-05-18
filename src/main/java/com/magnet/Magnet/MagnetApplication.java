@@ -33,6 +33,10 @@ public class MagnetApplication {
 		//TODO Submit query to the database
 		DataAccess dataAccess = new DataAccess();
 		dataAccess.addQuery(query);
+		//Get all queries
+		ArrayList<String> pastQueries = dataAccess.getQueries();
+		
+
 		// TODO send query to query processor
 		// query processor return list of urls or filenames
 		ArrayList<String> fileNames = new ArrayList<>();

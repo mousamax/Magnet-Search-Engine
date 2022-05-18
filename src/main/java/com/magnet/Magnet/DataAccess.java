@@ -1,6 +1,7 @@
 package com.magnet.Magnet;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -234,6 +235,24 @@ public class DataAccess {
         }
     }
 
+    //Select all from the database table "SearchData"
+    //return in a list
+    public ArrayList<String> getQueries() {
+        ArrayList<String> queries = new ArrayList<String>();
+        try {
+            // Obtain a statement
+            Statement st = connection.createStatement();
+            String query = "SELECT Query FROM SearchData;";
+            // Execute the query
+            ResultSet rs = st.executeQuery(query);
+            while (rs.next()) {
+                queries.add(rs.getString("Query"));
+            }
+        } catch (SQLException e) {
+        }
+        return queries;
+    }
+    
     // getUrl from the database table "CrawlerData" for a file name
     public String getUrl(String fileName) {
         try {
