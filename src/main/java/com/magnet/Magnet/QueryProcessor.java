@@ -71,7 +71,7 @@ public class QueryProcessor{
                                 {
                                     //phraseSearchingMap.put(queryArrayStemmed.get(i), mp.get(originalQueryArray.get(i)));
                                     //------------------phrase searching-------------------------------------
-                                    if(DocumentsContainingPhrase.containsKey(HTMLdoc.getKey()))
+                                    if(DocumentsContainingPhrase.containsKey(HTMLdoc.getKey()) && !isQuerySearching)
                                     {
                                         DocumentsContainingPhrase.replace(HTMLdoc.getKey(), DocumentsContainingPhrase.get(HTMLdoc.getKey()) + 1);
                                     }
@@ -80,15 +80,15 @@ public class QueryProcessor{
                                         DocumentsContainingPhrase.put(HTMLdoc.getKey(), 1);
                                     }
                                     //------------------end phrase searching-------------------------------------
-                                    files.add(HTMLdoc.getKey());
-                                    if(HTMLdocuments_scores.containsKey(HTMLdoc.getKey()))
-                                    {
-                                        HTMLdocuments_scores.replace(HTMLdoc.getKey(), HTMLdocuments_scores.get(HTMLdoc.getKey()) + HTMLdoc.getValue());
-                                    }
-                                    else
-                                    {
-                                        HTMLdocuments_scores.put(HTMLdoc.getKey(), HTMLdoc.getValue());
-                                    }
+                                    //files.add(HTMLdoc.getKey());
+                                    // if(HTMLdocuments_scores.containsKey(HTMLdoc.getKey()))
+                                    // {
+                                    //     HTMLdocuments_scores.replace(HTMLdoc.getKey(), HTMLdocuments_scores.get(HTMLdoc.getKey()) + HTMLdoc.getValue());
+                                    // }
+                                    // else
+                                    // {
+                                    //     HTMLdocuments_scores.put(HTMLdoc.getKey(), HTMLdoc.getValue());
+                                    // }
                                     processedMap.get(queryArrayStemmed.get(i)).get(originalQueryArray.get(i)).replace(HTMLdoc.getKey(), HTMLdoc.getValue() + 0.500);
                                 }
                         }
