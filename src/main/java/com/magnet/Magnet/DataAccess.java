@@ -351,8 +351,7 @@ public class DataAccess {
         try {
             // Obtain a statement
             Statement st = connection.createStatement();
-            String query = "INSERT INTO OriginalWords (OriginalWord, StemId) VALUES (N'" + originalWord + "', " + stemId
-                    + ");";
+            String query = "INSERT INTO OriginalWords (OriginalWord, StemId) VALUES (N'" + originalWord + "', " + stemId + ");";
             // Execute the query
             int count = st.executeUpdate(query);
             // Obtain a statement

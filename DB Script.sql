@@ -42,7 +42,7 @@ CREATE TABLE StemWords(
 Id INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
 StemTerm nvarchar(300) COLLATE Arabic_CI_AI_KS_WS NOT NULL,
 NumDocs int DEFAULT 0,
-IDF nvarchar(15)
+IDF DOUBLE PRECISION
 );
 
 CREATE TABLE OriginalWords(
@@ -56,7 +56,7 @@ FOREIGN KEY (stemId) REFERENCES StemWords(id)
 CREATE TABLE FilesAndScores(
 Id INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
 Filename nvarchar(55),
-Score nvarchar(15),
+Score DOUBLE PRECISION,
 originalWordId int NOT NULL,
 FOREIGN KEY (originalWordId) REFERENCES OriginalWords(id)
 );
