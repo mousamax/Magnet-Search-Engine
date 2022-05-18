@@ -78,18 +78,29 @@ public class DataAccess {
         }
     }
     // add UrlsToBeCrawled array to the database table "UrlsToBeCrawled"
-    public void addUrlsToBeCrawled(ConcurrentHashMap<String, Boolean> urlsToBeCrawled) {
+    public void addUrlsToBeCrawled(ConcurrentHashMap<String, Boolean> urlsToBeCrawled, String Url) {
         try {
+            // get url id from the database table "CrawlerData" where Url = Url
+            Statement st0 = connection.createStatement();
+            String query = "SELECT Id FROM CrawlerData WHERE Urls = N'" + Url + "'";
+            ResultSet rs = st0.executeQuery(query);
+            int urlID = 0;
+            while (rs.next()) {
+                urlID = rs.getInt("Id");
+            }
             // Obtain a statement
             Statement st = connection.createStatement();
             // insert the map of urls to be crawled into the database table
             // "UrlsToBeCrawled"
-            String query = "";
+            String queryTobeCrawled = "";
+            String queryToHyperLinks = "";
             for (String url : urlsToBeCrawled.keySet()) {
-                query += "INSERT INTO UrlsToBeCrawled (Urls) Select N'" + url + "' ;";
+                queryTobeCrawled += "INSERT INTO UrlsToBeCrawled (Urls) Select N'" + url + "' ;";
+                queryToHyperLinks += "INSERT INTO HyperLinks (UrlId,InnerUrl) Select "+ urlID +" , N'" + url + "' ;";
             }
             // Execute the query
-            int count = st.executeUpdate(query);
+            int count = st.executeUpdate(queryTobeCrawled);
+            int count2 = st.executeUpdate(queryToHyperLinks);
         } catch (SQLException e) {
             System.out.println("ignored duplicate url");}
     }

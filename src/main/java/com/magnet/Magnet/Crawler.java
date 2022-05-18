@@ -156,7 +156,7 @@ public class Crawler implements Runnable {
                 }
                 //add urls to database if size is greater than 0
                 if(urlsTobeSentToDB.size() > 0)
-                    dataAccess.addUrlsToBeCrawled(urlsTobeSentToDB);
+                    dataAccess.addUrlsToBeCrawled(urlsTobeSentToDB, url);
             }
         }
     }
