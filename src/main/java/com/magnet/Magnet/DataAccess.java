@@ -231,6 +231,9 @@ public class DataAccess {
                     // So increment the numberOfUrlsIamPointingTo
                     urlsCountMap.put(rs.getString("Url"), numberOfUrlsIamPointingTo + 1);
                 }
+            }
+        } catch (SQLException e) { }
+    }
     //getNumOfCrawledFiles from the database table "CrawlerData" count "filename" column
     public int getNumOfCrawledFiles() {
         int num = 0;
@@ -395,6 +398,7 @@ public class DataAccess {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return stemId;
     }
 
     // get count of all the urls in the database table "CrawlerData"
@@ -438,8 +442,7 @@ public class DataAccess {
             // }
             // Execute the query
             int count = st.executeUpdate(query);
-        } catch (SQLException e) {
-        return -1;
+        } catch (SQLException e) { }
     }
 
     // Add fileName and score to table "FilesAndScores" and return its id
