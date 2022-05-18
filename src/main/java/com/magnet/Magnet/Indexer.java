@@ -15,6 +15,7 @@ public class Indexer {
 
     public static void main(String[] args) throws JSONException, IOException, ParseException {
 
+        DataAccess dataAccess = new DataAccess();
         int choice;
         Scanner sc = new Scanner(System.in);
         System.out
@@ -39,7 +40,7 @@ public class Indexer {
 
             for (String fileName : files) {
                 //mp = readHTMLFile(fileName, stopWords, mp);
-                readHTMLFileDB(fileName, stopWords);
+                readHTMLFileDB(fileName, stopWords, dataAccess);
             }
 
             //writeToFile(convertToJSON(mp).toString(), "index.json");
@@ -113,7 +114,7 @@ public class Indexer {
         return sb.toString();
     }
 
-    public static void readHTMLFileDB(String fileName, Set<String> stopWords) throws IOException {
+    public static void readHTMLFileDB(String fileName, Set<String> stopWords, DataAccess dataAccess) throws IOException {
 
         // Define scores for terms in title and in body
         Double titleScore = 2.0;
@@ -122,6 +123,8 @@ public class Indexer {
         File input = new File("./html_files/" + fileName);
         // Use Jsoup to parse the file
         Document doc = Jsoup.parse(input, "UTF-8", "");
+        //Remove .html from the file name
+        String fileNameWithoutExtension = fileName.substring(0, fileName.length() - 5);
         // Save the title in a string
         String title = doc.title();
         // Save the body text in a string
@@ -147,7 +150,6 @@ public class Indexer {
             // Stemming
             String stemmedWord = stemming(word);
 
-            DataAccess dataAccess = new DataAccess();
 
             // Check if the stemmed term is in the DB
             if (dataAccess.getStemTermId(stemmedWord) == -1) {
@@ -224,7 +226,6 @@ public class Indexer {
             // Stemming
             String stemmedWord = stemming(word);
 
-            DataAccess dataAccess = new DataAccess();
 
             // Check if the stemmed term is in the DB
             if (dataAccess.getStemTermId(stemmedWord) == -1) {
