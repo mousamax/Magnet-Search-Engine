@@ -14,12 +14,12 @@ public class SearchController {
         for (int i = 0; i < htmlFileNameList.size(); i++) {
             String htmlFileName = htmlFileNameList.get(i);
             //get url from database where html filename is equal to the html filename column
-            //remove the html extension from the filename
-            String url = dataAccess.getUrl(htmlFileName.substring(0, htmlFileName.length() - 5));
+            //remove the html extension from the filename if it is there
+            String url = dataAccess.getUrl(htmlFileName);
             String title = "", description = "";
             try {
                 // Read file from given filename
-                File input = new File("./html_files/" + htmlFileName);
+                File input = new File("./html_files/" + htmlFileName + ".html");
                 // Use Jsoup to parse the file
                 Document doc = Jsoup.parse(input, "UTF-8", "");
                 // Save the title in a string
