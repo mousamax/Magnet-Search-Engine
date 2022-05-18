@@ -633,10 +633,22 @@ public class Indexer {
         return stopwordsSet;
     }
 
+    public static void calculateIDF_DB(DataAccess dataAccess, int numbeOfDocuments) {
+        // Calculate IDF
 
-    public static void calculateIDF_DB(DataAccess dataAccess,int numbeOfDocuments)
-    {
-        //Calculate IDF
+        //Get all terms
+        HashMap<Integer, Integer> terms = dataAccess.getAllTermsAndNumberOfDocuments();
+
+        //for each term
+        for (Integer termId: terms.keySet())
+        {
+            
+            //calculate the idf
+            double idf = Math.log10((double)numbeOfDocuments / (double)terms.get(termId));
+
+            //update the idf in the database
+            dataAccess.setIDF(termId, idf);
+        }
         
     }
 
