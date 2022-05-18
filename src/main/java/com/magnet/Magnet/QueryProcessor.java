@@ -12,20 +12,16 @@ import java.util.*;
 
 public class QueryProcessor{
 
- 
+    public static Map<String, Map<String, Map<String, Double>>> mp;
+    public static Set<String> stopWords;
+
     public static void main(String[] args) throws JSONException, IOException, FileNotFoundException, ParseException, org.json.simple.parser.ParseException  {
         String query = "computer the Universe in engineer department";
         QueryProcessing(query);
     }
     public static ArrayList<String> QueryProcessing(String query) throws IOException, JSONException, org.json.simple.parser.ParseException{
         query = query.toLowerCase();
-        //read json file
-                Map<String, Map<String, Map<String, Double>>> mp = new HashMap<String, Map<String, Map<String, Double>>>();
                 //ArrayList<String> files = getHTMLFiles(new File("./"));
-                Set<String> stopWords = loadStopwords();
-
-                mp = parseJSON();
-                
                 //final map containing the needed stemmed files that will be sent to the ranker
                 Map<String, Map<String, Map<String, Double>>> processedMap = new HashMap<String, Map<String, Map<String, Double>>>();
                 
@@ -52,8 +48,7 @@ public class QueryProcessor{
                     }   
                 }
                 //System.out.println(queryArrayStemmed);
-
-                ArrayList<String> files = new ArrayList<String>();
+        ArrayList<String> files = new ArrayList<String>();
                 Map<String, Integer> phraseDocuments = new HashMap<String, Integer>();
                 for(int i = 0; i < queryArrayStemmed.size();i++){
                     
@@ -75,7 +70,7 @@ public class QueryProcessor{
                                     //------------------end phrase searching-------------------------------------
                                     files.add(HTMLdoc.getKey());
                                     
-                                    processedMap.get(queryArrayStemmed.get(i)).get(originalQueryArray.get(i)).replace(HTMLdoc.getKey(), HTMLdoc.getValue() + 20);
+                                    //processedMap.get(queryArrayStemmed.get(i)).get(originalQueryArray.get(i)).replace(HTMLdoc.getKey(), HTMLdoc.getValue() + 20);
                                 }
                         }
                         // for(int j = 0; j < originalQueryArray.size();j++){
@@ -83,9 +78,8 @@ public class QueryProcessor{
                         // }
                     }
                 }
-                
-                System.out.println(processedMap);
-                System.out.println(phraseDocuments);
+                //System.out.println(processedMap);
+                //System.out.println(phraseDocuments);
         
                 //writeToFile(convertToJSON(processedMap).toString(), "processed.json");
                

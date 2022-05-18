@@ -18,13 +18,20 @@ import java.util.ArrayList;
 public class MagnetApplication {
 	ArrayList<String> fileNames;
 	ArrayList<SearchResult> results;
+	boolean loaded = false;
 	public static void main(String[] args) {
 		SpringApplication.run(MagnetApplication.class, args);
 	}
 
 	// home page for the app with search bar
 	@GetMapping("/")
-	public String home() {
+	public String home() throws IOException, ParseException {
+		if (!loaded) {
+		//load query processing data
+		QueryProcessor.mp = QueryProcessor.parseJSON();
+		QueryProcessor.stopWords = QueryProcessor.loadStopwords();
+		loaded = true;
+		}
 		// return greeting page
 		return "greeting";
 	}
