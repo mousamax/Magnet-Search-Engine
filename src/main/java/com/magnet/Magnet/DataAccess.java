@@ -179,6 +179,37 @@ public class DataAccess {
             e.printStackTrace();
         }
     }
+    // add query to the database table "SearchData" for a given query
+    public void addQuery(String query) {
+        try {
+            // Obtain a statement
+            Statement st = connection.createStatement();
+            String query1 = "INSERT INTO SearchData (Query) VALUES (N'" + query + "');";
+            // Execute the query
+            int count = st.executeUpdate(query1);
+        }
+        catch (SQLException e) { }
+    }
+    // getUrl from the database table "CrawlerData" for a file name
+    public String getUrl(String fileName) {
+        try {
+            // Obtain a statement
+            Statement st = connection.createStatement();
+            String query = "SELECT Urls FROM CrawlerData WHERE FileName = N'" + fileName + "';";
+            // Execute the query
+            ResultSet rs = st.executeQuery(query);
+            // Store the compactPages in the ConcurrentHashMap
+            while (rs.next()) {
+                //remove spaces from the url
+                String url = rs.getString("Urls").replaceAll("\\s+", "");
+                return url;
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
     // close the connection
     public void close() {
         try {

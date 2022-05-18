@@ -93,6 +93,11 @@ public class Crawler implements Runnable {
                     dataAccess.addVisitedUrl(url);
                     continue;
                 }
+                //chack doc html lang attribute with jsoup and if not english, skip
+
+                if (!doc.html().contains("lang=\"en\"")) {
+                    System.out.println(Thread.currentThread().getName() + ":Not English... " + url);
+                }
                 String compactPage = UrlUtils.compactPage(doc.body().text());
                 // print compact page
                 System.out.println(Thread.currentThread().getName() + ":Compact Page: " + compactPage);
