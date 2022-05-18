@@ -1,7 +1,10 @@
 package com.magnet.Magnet;
 
 import java.sql.*;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class DataAccess {
     private Connection connection;
@@ -74,7 +77,6 @@ public class DataAccess {
             e.printStackTrace();
         }
     }
-
     // add UrlsToBeCrawled array to the database table "UrlsToBeCrawled"
     public void addUrlsToBeCrawled(ConcurrentHashMap<String, Boolean> urlsToBeCrawled) {
         try {
@@ -89,8 +91,7 @@ public class DataAccess {
             // Execute the query
             int count = st.executeUpdate(query);
         } catch (SQLException e) {
-            System.out.println("ignored duplicate url");
-        }
+            System.out.println("ignored duplicate url");}
     }
 
     // retrieve all the urls to be crawled from the database table "UrlsToBeCrawled"
@@ -188,6 +189,50 @@ public class DataAccess {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+
+    // ? Check if we need to change the query as we will use the IDs
+    public void getRelatedUrls(ConcurrentHashMap<String, List<String>> urlsPointingToMe,
+            ConcurrentHashMap<String, Integer> urlsCountMap, ConcurrentHashMap<String, Double> urlPopularityMap,
+            int totalLinksNum) {
+        try {
+            // Obtain a statement
+            Statement st = connection.createStatement();
+            String query = "Select * FROM UrlAndInnerUrls";
+            // Execute the query
+            ResultSet rs = st.executeQuery(query);
+            // Store the urls and innerUrl in the Maps
+            while (rs.next()) {
+                // add to the urlsPointingToMe
+                List<String> urlList = urlsPointingToMe.get(rs.getString("InnerUrl"));
+                if (urlList == null) {
+                    // Did not find the InnerUrl before
+                    // * Stream.collect(Collectors.toList()); This makes the list modifiable
+                    // Initialize the list with the first Url
+                    urlList = Stream.of(rs.getString("Url")).collect(Collectors.toList());
+                    // Add list of Urls to the map with InnerUrl as the key
+                    urlsPointingToMe.put(rs.getString("InnerUrl"), urlList);
+                    // Assign initial popularity
+                    Double popu = 1.0 / totalLinksNum;
+                    urlPopularityMap.put(rs.getString("InnerUrl"), popu);
+                } else {
+                    // Found the InnerUrl
+                    // So add the url to its urlList
+                    urlList.add(rs.getString("Url"));
+                }
+
+                Integer numberOfUrlsIamPointingTo = urlsCountMap.get(rs.getString("Url"));
+                if (numberOfUrlsIamPointingTo == null) {
+                    // Did not find the Url
+                    urlsCountMap.put(rs.getString("Url"), 1);
+                } else {
+                    // Found the Url
+                    // So increment the numberOfUrlsIamPointingTo
+                    urlsCountMap.put(rs.getString("Url"), numberOfUrlsIamPointingTo + 1);
+                }
+            }
+        } catch (SQLException e) { }
     }
     //getNumOfCrawledFiles from the database table "CrawlerData" count "filename" column
     public int getNumOfCrawledFiles() {
@@ -353,7 +398,51 @@ public class DataAccess {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return -1;
+        return stemId;
+    }
+
+    // get count of all the urls in the database table "CrawlerData"
+    public int getCountOfUrls() {
+        int count = 0;
+        try {
+            // Obtain a statement
+            Statement st = connection.createStatement();
+            String query = "SELECT COUNT(*) FROM CrawlerData;";
+            // Execute the query
+            ResultSet rs = st.executeQuery(query);
+            while (rs.next()) {
+                count = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+    // public void addUrlsPopularity(ConcurrentHashMap<String, Double>
+    // urlPopularityMap, String[] urlsArray, Double[] popularitiesArray, int start,
+    // int end) {
+
+    // Update Urls Popularity
+    public void addUrlsPopularity(String[] urlsArray, Double[] popularitiesArray, int start, int end) {
+        try {
+            // Obtain a statement
+            Statement st = connection.createStatement();
+            // insert the map of urls to be crawled into the database table
+            // "UrlsToBeCrawled"
+            String query = "";
+            // UPDATE CrawlerData SET Popularity = 2.0202 WHERE Urls='A';
+            for (int i = start; i < end; i++) {
+                query += "UPDATE CrawlerData SET Popularity = " + popularitiesArray[i] +
+                        " WHERE Urls='" + urlsArray[i] + "';";
+            }
+            // for (ConcurrentHashMap.Entry<String, Double> url :
+            // urlPopularityMap.entrySet()) {
+            // query += "UPDATE CrawlerData SET Popularity = " + url.getValue() +
+            // " WHERE Urls='" + url.getKey() + "';";
+            // }
+            // Execute the query
+            int count = st.executeUpdate(query);
+        } catch (SQLException e) { }
     }
 
     // Add fileName and score to table "FilesAndScores" and return its id
@@ -382,7 +471,6 @@ public class DataAccess {
         }
         return -1;
     }
-
     // Get score from table "FilesAndScores"
     // given a fileId
     public double getScore(int fileId) {
