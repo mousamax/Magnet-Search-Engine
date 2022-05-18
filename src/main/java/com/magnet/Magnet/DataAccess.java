@@ -258,10 +258,11 @@ public class DataAccess {
     // Check if StemTerm exists in database table "StemWords"
     // and return its id
     public int getStemTermId(String stemTerm) {
+        String query = "";
         try {
             // Obtain a statement
             Statement st = connection.createStatement();
-            String query = "SELECT Id FROM StemWords WHERE StemTerm = N'" + stemTerm + "';";
+            query = "SELECT Id FROM StemWords WHERE StemTerm = N'" + stemTerm + "';";
             // Execute the query
             ResultSet rs = st.executeQuery(query);
             // Store the compactPages in the ConcurrentHashMap
@@ -271,7 +272,8 @@ public class DataAccess {
                 return id;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            //print query
+            System.out.println("getStemTermId:" + query);
         }
         return -1;
     }
