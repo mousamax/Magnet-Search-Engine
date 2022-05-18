@@ -14,8 +14,8 @@ public class QueryProcessor{
 
  
     public static void main(String[] args) throws JSONException, IOException, FileNotFoundException, ParseException, org.json.simple.parser.ParseException  {
-        String query = "computer the universe in engineer department";
-        QueryProcessing(query);
+        String query = "computer the Universe in engineer department";
+        QueryProcessing(query.toLowerCase());
     }
     public static ArrayList<String> QueryProcessing(String query) throws IOException, JSONException, org.json.simple.parser.ParseException{
                 //read json file
