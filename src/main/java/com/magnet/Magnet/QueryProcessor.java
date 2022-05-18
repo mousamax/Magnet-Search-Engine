@@ -12,23 +12,27 @@ import java.util.*;
 
 public class QueryProcessor{
 
- 
+    public static Map<String, Map<String, Map<String, Double>>> mp;
+    public static Set<String> stopWords;
+
     public static void main(String[] args) throws JSONException, IOException, FileNotFoundException, ParseException, org.json.simple.parser.ParseException  {
-        String query = "computer the Universe in engineer department";
+        String query = "computer the Universe in engineer";
+        QueryProcessor.mp = QueryProcessor.parseJSON();
+		QueryProcessor.stopWords = QueryProcessor.loadStopwords();
         QueryProcessing(query);
     }
     public static ArrayList<String> QueryProcessing(String query) throws IOException, JSONException, org.json.simple.parser.ParseException{
         query = query.toLowerCase();
-        //read json file
-                Map<String, Map<String, Map<String, Double>>> mp = new HashMap<String, Map<String, Map<String, Double>>>();
                 //ArrayList<String> files = getHTMLFiles(new File("./"));
-                Set<String> stopWords = loadStopwords();
-
-                mp = parseJSON();
-                
                 //final map containing the needed stemmed files that will be sent to the ranker
                 Map<String, Map<String, Map<String, Double>>> processedMap = new HashMap<String, Map<String, Map<String, Double>>>();
-        
+                
+            
+                //------------------phrase searching-------------------------------------
+                //Map<String, Map<String, Map<String, Double>>> phraseSearchingMap = new HashMap<String, Map<String, Map<String, Double>>>();
+               
+
+                //------------------end phrase searching-------------------------------------
 
                 System.out.println(query);
                 //each word in original query splitted 
@@ -45,33 +49,69 @@ public class QueryProcessor{
                         originalQueryArray.add(queryArray[i]);
                     }   
                 }
-                System.out.println(queryArrayStemmed);
+                //System.out.println(queryArrayStemmed);
 
                 ArrayList<String> files = new ArrayList<String>();
-                for(Map.Entry<String, Map<String, Map<String, Double>>> entry : mp.entrySet()){
+                Map<String, Integer> DocumentsContainingPhrase = new HashMap<String, Integer>();
+                Map<String,Double> HTMLdocuments_scores = new HashMap<String,Double>();
+                for(int i = 0; i < queryArrayStemmed.size();i++){
                     
-                    if(queryArrayStemmed.contains(entry.getKey())){
-                        processedMap.put(entry.getKey(), entry.getValue());
-                        for(Map.Entry<String, Map<String, Double>> originalWord : entry.getValue().entrySet())
-                        {
-                            if(originalQueryArray.contains(originalWord.getKey()))
-                            {
-                                for(Map.Entry<String, Double> HTMLdoc : originalWord.getValue().entrySet())
-                                {
-                                    files.add(HTMLdoc.getKey());
-                                    processedMap.get(entry.getKey()).get(originalWord.getKey()).replace(HTMLdoc.getKey(), HTMLdoc.getValue() + 20);
-                                }
-                            }
-                        }
-                        //System.out.println(entry.getKey());
-                        //System.out.println(entry.getValue());
+                    if(mp.containsKey(queryArrayStemmed.get(i))){
                         
-                    } 
+                        processedMap.put(queryArrayStemmed.get(i), mp.get(queryArrayStemmed.get(i)));
+                        if(mp.get(queryArrayStemmed.get(i)).containsKey(originalQueryArray.get(i))){
+                            for(Map.Entry<String, Double> HTMLdoc : mp.get(queryArrayStemmed.get(i)).get(originalQueryArray.get(i)).entrySet())
+                                {
+                                    //phraseSearchingMap.put(queryArrayStemmed.get(i), mp.get(originalQueryArray.get(i)));
+                                    //------------------phrase searching-------------------------------------
+                                    if(DocumentsContainingPhrase.containsKey(HTMLdoc.getKey()))
+                                    {
+                                        DocumentsContainingPhrase.replace(HTMLdoc.getKey(), DocumentsContainingPhrase.get(HTMLdoc.getKey()) + 1);
+                                    }
+                                    else
+                                    {
+                                        DocumentsContainingPhrase.put(HTMLdoc.getKey(), 1);
+                                    }
+                                    //------------------end phrase searching-------------------------------------
+                                    files.add(HTMLdoc.getKey());
+                                    if(HTMLdocuments_scores.containsKey(HTMLdoc.getKey()))
+                                    {
+                                        HTMLdocuments_scores.replace(HTMLdoc.getKey(), HTMLdocuments_scores.get(HTMLdoc.getKey()) + HTMLdoc.getValue());
+                                    }
+                                    else
+                                    {
+                                        HTMLdocuments_scores.put(HTMLdoc.getKey(), HTMLdoc.getValue());
+                                    }
+                                    //processedMap.get(queryArrayStemmed.get(i)).get(originalQueryArray.get(i)).replace(HTMLdoc.getKey(), HTMLdoc.getValue() + 20);
+                                }
+                        }
+                        // for(int j = 0; j < originalQueryArray.size();j++){
+                            
+                        // }
+
+                    }
                 }
-                System.out.println(processedMap);
+                for(Map.Entry<String, Integer> HTMLdoc : DocumentsContainingPhrase.entrySet())
+                {
+                    if(HTMLdoc.getValue() != queryArrayStemmed.size())
+                    {
+                        //files.add(HTMLdoc.getKey());
+                        // for(int i = 0; i < queryArrayStemmed.size();i++){
+                        //     // Map<String, Map<String, Double>> temp = new HashMap<String, Map<String, Double>>();
+                        //     // temp = processedMap.get(queryArrayStemmed.get(i));
+                            
+                        //     // temp.replace(HTMLdoc, temp.get(HTMLdoc));
+                        //     // phraseSearchingMap.put(queryArrayStemmed.get(i), mp.get(queryArrayStemmed.get(i)));
+                        // }
+                        
+                        DocumentsContainingPhrase.remove(HTMLdoc.getKey());
+                    }
+                }
                 
+                System.out.println(processedMap);
+                System.out.println(DocumentsContainingPhrase);
         
-                writeToFile(convertToJSON(processedMap).toString(), "processed.json");
+                //writeToFile(convertToJSON(processedMap).toString(), "processed.json");
                
                 return files;
     };
@@ -88,7 +128,7 @@ public class QueryProcessor{
         Map<String, Map<String, Map<String, Double>>> processedMap = new HashMap<String, Map<String, Map<String, Double>>>();
 
 
-        System.out.println(query);
+        //System.out.println(query);
         //each word in original query splitted 
         String[] queryArray = query.split(" ");
         //each word in original query after stemming and removing stop words
@@ -103,7 +143,7 @@ public class QueryProcessor{
                 originalQueryArray.add(queryArray[i]);
             }   
         }
-        System.out.println(queryArrayStemmed);
+        //System.out.println(queryArrayStemmed);
 
 
         for(Map.Entry<String, Map<String, Map<String, Double>>> entry : mp.entrySet()){
@@ -125,7 +165,7 @@ public class QueryProcessor{
                 
             } 
         }
-        System.out.println(processedMap);
+        //System.out.println(processedMap);
         
 
         writeToFile(convertToJSON(processedMap).toString(), "processed.json");
