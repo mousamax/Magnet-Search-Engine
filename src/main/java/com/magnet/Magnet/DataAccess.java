@@ -96,13 +96,14 @@ public class DataAccess {
             // "UrlsToBeCrawled"
             String queryTobeCrawled = "";
             String queryToHyperLinks = "";
-            for (String url : urlsToBeCrawled.keySet()) {
-                queryTobeCrawled += "INSERT INTO UrlsToBeCrawled (Urls) Select N'" + url + "' ;";
-                queryToHyperLinks += "INSERT INTO HyperLinks (UrlId,InnerUrl) Select "+ urlID +" , N'" + url + "' ;";
+            for (String HyperLink : urlsToBeCrawled.keySet()) {
+                queryTobeCrawled += "INSERT INTO UrlsToBeCrawled (Urls) Select N'" + HyperLink + "' ;";
+                queryToHyperLinks += "INSERT INTO HyperLinks (UrlId,InnerUrl) Select "+ urlID +" , N'" + HyperLink + "' ;";
             }
             // Execute the query
             int count = st.executeUpdate(queryTobeCrawled);
-            int count2 = st.executeUpdate(queryToHyperLinks);
+            Statement st2 = connection.createStatement();
+            int count2 = st2.executeUpdate(queryToHyperLinks);
         } catch (SQLException e) {
             System.out.println("ignored duplicate url");}
     }

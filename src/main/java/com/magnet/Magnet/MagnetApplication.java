@@ -40,23 +40,23 @@ public class MagnetApplication {
 		// TODO send query to query processor
 		// query processor return list of urls or filenames
 		ArrayList<String> fileNames = new ArrayList<>();
-		fileNames.add("00.html");
-		fileNames.add("10.html");
-		fileNames.add("20.html");
-		fileNames.add("31.html");
-		fileNames.add("312.html");
-		fileNames.add("436.html");
-		fileNames.add("572.html");
-		fileNames.add("601.html");
-		fileNames.add("692.html");
-		fileNames.add("711.html");
-		fileNames.add("771.html");
-		fileNames.add("875.html");
-		fileNames.add("913.html");
-		fileNames.add("972.html");
-		fileNames.add("1029.html");
+		fileNames.add("00");
+		fileNames.add("10");
+		fileNames.add("20");
+		fileNames.add("26");
+		fileNames.add("83");
+		fileNames.add("150");
+		fileNames.add("160");
+		fileNames.add("120");
+		fileNames.add("692");
+		fileNames.add("711");
+		fileNames.add("771");
+		fileNames.add("875");
+		fileNames.add("913");
+		fileNames.add("200");
+		fileNames.add("140");
 		// TODO parse list of filenames to list of magnet links
-		ArrayList<SearchResult> results = new ArrayList<SearchResult>();
+		ArrayList<SearchResult> results = new ArrayList<>();
 		SearchController searchController = new SearchController();
 		searchController.fillSearchResultList(results, fileNames);
 		model.addAttribute("query", query);

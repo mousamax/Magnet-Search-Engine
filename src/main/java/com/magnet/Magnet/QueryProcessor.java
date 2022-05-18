@@ -14,8 +14,8 @@ public class QueryProcessor{
 
  
     public static void main(String[] args) throws JSONException, IOException, FileNotFoundException, ParseException, org.json.simple.parser.ParseException  {
-        String query = "Computer the Universe in engineer Department";
-        QueryProcessing(query);
+        String query = "computer the Universe in engineer department";
+        QueryProcessing(query.toLowerCase());
     }
     public static ArrayList<String> QueryProcessing(String query) throws IOException, JSONException, org.json.simple.parser.ParseException{
                 //read json file
@@ -26,7 +26,7 @@ public class QueryProcessor{
                 //for each file
                 JSONParser jsonParser = new JSONParser();
                  
-                FileReader reader = new FileReader("index.json");
+                FileReader reader = new FileReader("./indexer result/index.json");
                 //Read JSON file
                 Object obj = jsonParser.parse(reader);
                 
@@ -51,9 +51,7 @@ public class QueryProcessor{
                     }   
                 }
                 System.out.println(queryArrayStemmed);
-                //System.out.println(queryArray);
-                //loop through mp
-                //loop through mp
+
 
                 for(Map.Entry<String, Map<String, Map<String, Double>>> entry : mp.entrySet()){
         
@@ -77,22 +75,28 @@ public class QueryProcessor{
                 System.out.println(processedMap);
                 
         
-                writeToFile(convertToJSON(processedMap).toString(), "./processed.json");
+                writeToFile(convertToJSON(processedMap).toString(), "processed.json");
                 ArrayList<String> files = new ArrayList<String>();
                 return files;
     };
     public static JSONObject convertToJSON(Map<String, Map<String, Map<String, Double>>> mp) throws JSONException {
-        
-        //convert to JSON
+
+        // convert to JSON
         JSONObject json = new JSONObject();
-        for (String term : mp.keySet()) {
-            JSONObject jsonTerm = new JSONObject();
-            for (String file : mp.get(term).keySet()) {
-                jsonTerm.put(file, mp.get(term).get(file));
+        for (String stemmedWord : mp.keySet()) {
+            JSONObject jsonObject = new JSONObject();
+            Map<String, Map<String, Double>> originalWordMap = mp.get(stemmedWord);
+            for (String originalWord : originalWordMap.keySet()) {
+                JSONObject jsonObject2 = new JSONObject();
+                Map<String, Double> fileMap = originalWordMap.get(originalWord);
+                for (String fileName : fileMap.keySet()) {
+                    jsonObject2.put(fileName, fileMap.get(fileName));
+                }
+                jsonObject.put(originalWord, jsonObject2);
             }
-            json.put(term, jsonTerm);
+            json.put(stemmedWord, jsonObject);
         }
-    
+
         return json;
     }
 
@@ -104,22 +108,44 @@ public class QueryProcessor{
     }
 
     public static void writeToFile(String str, String filename) throws IOException {
-        BufferedWriter bw = new BufferedWriter(new FileWriter(filename));
+        BufferedWriter bw = new BufferedWriter(new FileWriter("./Query Processor Result/" + filename));
         bw.write(str);
         bw.close();
     }
 
     public static Set<String> loadStopwords() throws IOException {
 
-        // read stopwords from file
-        FileReader fr = new FileReader("./english_stopwords.txt");
-        BufferedReader br = new BufferedReader(fr);
+        // Read stopwords from file
+        FileReader frAr = new FileReader("./arabic stopwords/arabic_stopwords.txt");
+
+        BufferedReader brAr = new BufferedReader(frAr);
         String s = "";
         Set<String> stopwordsSet = new HashSet<String>();
-        while ((s = br.readLine()) != null) {
+        while ((s = brAr.readLine()) != null) {
             stopwordsSet.add(s);
         }
-        br.close();
+
+        FileReader frEn = new FileReader("./english stopwords/english_stopwords.txt");
+        BufferedReader brEn = new BufferedReader(frEn);
+
+        while ((s = brEn.readLine()) != null) {
+            stopwordsSet.add(s);
+        }
+
+        brAr.close();
+        brEn.close();
+
+        stopwordsSet.add("*");
+        stopwordsSet.add("/");
+        stopwordsSet.add("\\");
+        stopwordsSet.add("$");
+        stopwordsSet.add("^");
+        stopwordsSet.add("#");
+        stopwordsSet.add("@");
+        stopwordsSet.add("!");
+        stopwordsSet.add("&");
+        stopwordsSet.add("-");
+
         return stopwordsSet;
     }
     
