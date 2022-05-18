@@ -30,9 +30,10 @@ public class Indexer {
         Set<String> stopWords = loadStopwords();
         if (choice == 1) {
 
-            // Key: Term
-            // Value: Map with: Key: filename , Value: Term Frequency
-            Map<String, Map<String, Double>> mp = new HashMap<String, Map<String, Double>>();
+            // Key: Stemmed Term
+            // Value: Map with: Key: Original Word, Value: Map with:
+            // Key: File name, Value: Normalized TF * IDF
+            Map<String, Map<String, Map<String, Double>>> mp = new HashMap<String, Map<String, Map<String, Double>>>();
             ArrayList<String> files = getHTMLFiles(new File("./html_files"));
 
             int numberOfDocuments = files.size();
@@ -45,7 +46,8 @@ public class Indexer {
             writeToFile(convertToJSON(mp).toString(), "index.json");
             System.out.println("--------------------------------");
             System.out.println(
-                    "\u001B[32m" + "Finished indexing all files\nOutput of the indexer is written in index.json"
+                    "\u001B[32m"
+                            + "Finished indexing all files\nOutput of the indexer is written in ./indexer/result/index.json"
                             + "\u001B[0m");
         } else {
             String HTMLFileName;
@@ -60,7 +62,7 @@ public class Indexer {
             String indexFileString = readFile("./indexer result/index.json");
 
             // Parse the json file and save it in a map
-            Map<String, Map<String, Double>> mp = parseJSON(indexFileString);
+            Map<String, Map<String, Map<String, Double>>> mp = parseJSON(indexFileString);
 
             // Update the map
             mp = readHTMLFile(HTMLFileName, stopWords, mp);
@@ -76,12 +78,12 @@ public class Indexer {
         sc.close();
     }
 
-    public static Map<String, Map<String, Double>> parseJSON(String stringToParse) throws ParseException {
+    public static Map<String, Map<String, Map<String, Double>>> parseJSON(String stringToParse) throws ParseException {
 
         JSONParser jsonParser = new JSONParser();
         Object obj = jsonParser.parse(stringToParse);
-        Map<String, Map<String, Double>> mp = new HashMap<String, Map<String, Double>>();
-        mp = (Map<String, Map<String, Double>>) obj;
+        Map<String, Map<String, Map<String, Double>>> mp = new HashMap<String, Map<String, Map<String, Double>>>();
+        mp = (Map<String, Map<String, Map<String, Double>>>) obj;
         return mp;
 
     }
@@ -113,8 +115,8 @@ public class Indexer {
         return sb.toString();
     }
 
-    public static Map<String, Map<String, Double>> readHTMLFile(String fileName, Set<String> stopWords,
-            Map<String, Map<String, Double>> mp) throws IOException {
+    public static Map<String, Map<String, Map<String, Double>>> readHTMLFile(String fileName, Set<String> stopWords,
+            Map<String, Map<String, Map<String, Double>>> mp) throws IOException {
 
         // Define scores for terms in title and in body
         Double titleScore = 2.0;
@@ -134,6 +136,10 @@ public class Indexer {
         // Calculate docLength, will be used to calculate the normalized TF
         Integer docLength = bodyWords.length + titleWords.length;
 
+
+        //Remove .html from file name
+        fileName = fileName.substring(0, fileName.length() - 5);
+
         // Loop on title words and add them to the map
         for (String word : titleWords) {
 
@@ -141,7 +147,7 @@ public class Indexer {
             word = word.toLowerCase();
 
             // Stemming
-            word = stemming(word);
+            String stemmedWord = stemming(word);
 
             // Remove stop words
             if (stopWords.contains(word)) {
@@ -149,38 +155,49 @@ public class Indexer {
             }
 
             // Add to map
+            // If the map already contains the stemmed term
+            if (mp.containsKey(stemmedWord)) {
+                Map<String, Map<String, Double>> originalWordMap = mp.get(stemmedWord);
 
-            // If the map already contains the term
-            if (mp.containsKey(word)) {
-                Map<String, Double> mpTemp = mp.get(word);
+                // If the map already contains the original term
+                if (originalWordMap.containsKey(word)) {
+                    Map<String, Double> fileMap = originalWordMap.get(word);
 
-                // If the map already contains the filename
-                if (mpTemp.containsKey(fileName)) {
-                    // Normalized TF * docLength = TF
-                    // TF++
-                    // Normalized TF = TF / docLength
-                    Object tf = mpTemp.get(fileName);
-                    Double tf2 = (Double) tf;
-
-                    Double normalizedTF = (Double) (((tf2 * docLength) + titleScore)
-                            / docLength);
-
-                    if (normalizedTF < 0.5f) {
-                        mpTemp.put(fileName, normalizedTF);
+                    // If the map already contains the filename
+                    if (fileMap.containsKey(fileName)) {
+                        // Update the score
+                        // Update the score
+                        // Normalized TF * docLength = TF
+                        // TF++
+                        // Normalized TF = TF / docLength
+                        Object tf = fileMap.get(fileName);
+                        Double tf2 = (Double) tf;
+                        Double normalizedTF = (Double) (((tf2 * docLength) + titleScore)
+                                / docLength);
+                        fileMap.put(fileName, normalizedTF);
+                        fileMap.put(fileName, normalizedTF);
                     } else {
-                        // Spam
-                        mpTemp.put(fileName, 0.0);
+                        // Add the filename and term frequency
+                        fileMap.put(fileName, titleScore / docLength);
                     }
                 } else {
-                    mpTemp.put(fileName, (Double) (titleScore / docLength));
+                    // Original word map does not contain the original term
+                    // Add the original term and filename and term frequency
+                    Map<String, Double> fileMap = new HashMap<String, Double>();
+                    fileMap.put(fileName, titleScore / docLength);
+                    originalWordMap.put(word, fileMap);
                 }
-                mp.put(word, mpTemp);
-
             } else {
-                Map<String, Double> mpTemp = new HashMap<String, Double>();
-                mpTemp.put(fileName, (Double) (titleScore / docLength));
-                mp.put(word, mpTemp);
+                
+                // mp does not contain the stemmed term
+                // Add the stemmed term and original term and filename and term frequency
+                Map<String, Double> fileMap = new HashMap<String, Double>();
+                fileMap.put(fileName, titleScore / docLength);
+                Map<String, Map<String, Double>> originalWordMap = new HashMap<String, Map<String, Double>>();
+                originalWordMap.put(word, fileMap);
+                mp.put(stemmedWord, originalWordMap);
             }
+
         }
 
         // Loop on body words and add them to the map
@@ -190,7 +207,7 @@ public class Indexer {
             word = word.toLowerCase();
 
             // Stemming
-            word = stemming(word);
+            String stemmedWord = stemming(word);
 
             // Remove stop words
             if (stopWords.contains(word)) {
@@ -198,178 +215,69 @@ public class Indexer {
             }
 
             // Add to map
-            if (mp.containsKey(word)) {
-                Map<String, Double> mpTemp = mp.get(word);
 
-                if (mpTemp.containsKey(fileName)) {
-                    // Normalized TF * docLength = TF
-                    // TF++
-                    // Normalized TF = TF / docLength
-                    Object tf = mpTemp.get(fileName);
-                    Double tf2 = (Double) tf;
+            // If the map already contains the stemmed term
+            if (mp.containsKey(stemmedWord)) {
+                Map<String, Map<String, Double>> originalWordMap = mp.get(stemmedWord);
 
-                    Double normalizedTF = (Double) (((tf2 * docLength) + bodyScore)
-                            / docLength);
+                // If the map already contains the original term
+                if (originalWordMap.containsKey(word)) {
+                    Map<String, Double> fileMap = originalWordMap.get(word);
 
-                    if (normalizedTF < 0.5f) {
-                        mpTemp.put(fileName, normalizedTF);
+                    // If the map already contains the filename
+                    if (fileMap.containsKey(fileName)) {
+                        // Update the score
+                        // Normalized TF * docLength = TF
+                        // TF++
+                        // Normalized TF = TF / docLength
+                        Object tf = fileMap.get(fileName);
+                        Double tf2 = (Double) tf;
+
+                        Double normalizedTF = (Double) (((tf2 * docLength) + bodyScore)
+                                / docLength);
+                        fileMap.put(fileName, normalizedTF);
                     } else {
-                        // Spam
-                        mpTemp.put(fileName, 0.0);
+                        // Add the filename and term frequency
+                        fileMap.put(fileName, bodyScore / docLength);
                     }
                 } else {
-                    mpTemp.put(fileName, (Double) (bodyScore / docLength));
+                    // Original word map does not contain the original term
+                    // Add the original term and filename and term frequency
+                    Map<String, Double> fileMap = new HashMap<String, Double>();
+                    fileMap.put(fileName, bodyScore / docLength);
+                    originalWordMap.put(word, fileMap);
                 }
-                mp.put(word, mpTemp);
-
             } else {
-                Map<String, Double> mpTemp = new HashMap<String, Double>();
-                mpTemp.put(fileName, (Double) (bodyScore / docLength));
-                mp.put(word, mpTemp);
+                // mp does not contain the stemmed term
+                // Add the stemmed term and original term and filename and term frequency
+                Map<String, Double> fileMap = new HashMap<String, Double>();
+                fileMap.put(fileName, bodyScore / docLength);
+                Map<String, Map<String, Double>> originalWordMap = new HashMap<String, Map<String, Double>>();
+                originalWordMap.put(word, fileMap);
+                mp.put(stemmedWord, originalWordMap);
             }
+
         }
 
         return mp;
     }
 
-    public static Map<String, Map<String, Double>> readHTMLFileOld(String fileName, Set<String> stopWords,
-            Map<String, Map<String, Double>> mp) throws IOException {
-
-        // Read HTML file
-        FileReader fr = new FileReader("./html_files/" + fileName);
-        BufferedReader br = new BufferedReader(fr);
-        StringBuilder content = new StringBuilder(1024);
-        String s = "";
-        // First line is url
-        // String url = br.readLine();
-        // Document document = Jsoup.connect(url).get();
-        // String title = document.title();
-        String title = "TEMP";
-
-        while ((s = br.readLine()) != null) {
-            content.append(s.toLowerCase());
-        }
-        br.close();
-        fr.close();
-
-        // Remove white space and tags
-        // And save the words in a hash map
-        String words = content.toString();
-        String currentWord = "";
-
-        // Calculate length of document (without HTML tags and spaces)
-        Integer docLength = 0;
-        for (Integer i = 0; i < words.length(); i++) {
-            if (words.charAt(i) == ' ') {
-                if (currentWord.length() > 0) {
-
-                    // Don't count stop words
-                    if (stopWords.contains(currentWord)) {
-                        currentWord = "";
-                        continue;
-                    }
-                    docLength++;
-                    currentWord = "";
-                }
-                continue;
-            } else if (words.charAt(i) == '<') {
-                while (words.charAt(i) != '>') {
-                    i++;
-                }
-
-            } else {
-                currentWord += words.charAt(i);
-
-            }
-        }
-
-        // For each word (don't include HTML tags + spaces),
-        // Save the word in a hash map with the filename as the key and the normalized
-        // term frequency as the value
-        for (Integer i = 0; i < words.length(); i++) {
-            if (words.charAt(i) == ' ') {
-                if (currentWord.length() > 0) {
-
-                    // Stemming
-                    currentWord = stemming(currentWord);
-
-                    // Remove stop words
-                    if (stopWords.contains(currentWord)) {
-                        currentWord = "";
-                        continue;
-                    }
-
-                    if (mp.containsKey(currentWord)) {
-                        Map<String, Double> mpTemp = mp.get(currentWord);
-
-                        if (mpTemp.containsKey(fileName)) {
-                            // Normalized TF * docLength = TF
-                            // TF++
-                            // Normalized TF = TF / docLength
-
-                            Object tf = mpTemp.get(fileName);
-                            // Double dblVal = (Double) tf;
-                            Double tf2 = (Double) tf;
-
-                            Double normalizedTF = (Double) (((tf2 * docLength) + 1.0)
-                                    / docLength);
-
-                            // If the term is in the title, add 0.3
-                            if (title.contains(currentWord)) {
-                                normalizedTF += 0.3f;
-                            }
-                            if (normalizedTF < 0.5f) {
-                                mpTemp.put(fileName, normalizedTF);
-                            } else {
-                                // Spam
-                                mpTemp.put(fileName, 0.0);
-                            }
-                        } else {
-                            // If the term is in the title, add 0.3
-                            if (title.contains(currentWord)) {
-                                mpTemp.put(fileName, (Double) (1.0 / docLength) + 0.3);
-                            } else {
-                                mpTemp.put(fileName, (Double) (1.0 / docLength));
-                            }
-                        }
-                        mp.put(currentWord, mpTemp);
-
-                    } else {
-                        Map<String, Double> mpTemp = new HashMap<String, Double>();
-                        // If the term is in the title, add 0.3
-                        if (title.contains(currentWord)) {
-                            mpTemp.put(fileName, (Double) (1.0 / docLength) + 0.3);
-                        } else {
-                            mpTemp.put(fileName, (Double) (1.0 / docLength));
-                        }
-                        mp.put(currentWord, mpTemp);
-                    }
-                    currentWord = "";
-                }
-                continue;
-            } else if (words.charAt(i) == '<') {
-                while (words.charAt(i) != '>') {
-                    i++;
-                }
-
-            } else {
-                currentWord += words.charAt(i);
-
-            }
-        }
-        return mp;
-    }
-
-    public static JSONObject convertToJSON(Map<String, Map<String, Double>> mp) throws JSONException {
+    public static JSONObject convertToJSON(Map<String, Map<String, Map<String, Double>>> mp) throws JSONException {
 
         // convert to JSON
         JSONObject json = new JSONObject();
-        for (String term : mp.keySet()) {
-            JSONObject jsonTerm = new JSONObject();
-            for (String file : mp.get(term).keySet()) {
-                jsonTerm.put(file, mp.get(term).get(file));
+        for (String stemmedWord : mp.keySet()) {
+            JSONObject jsonObject = new JSONObject();
+            Map<String, Map<String, Double>> originalWordMap = mp.get(stemmedWord);
+            for (String originalWord : originalWordMap.keySet()) {
+                JSONObject jsonObject2 = new JSONObject();
+                Map<String, Double> fileMap = originalWordMap.get(originalWord);
+                for (String fileName : fileMap.keySet()) {
+                    jsonObject2.put(fileName, fileMap.get(fileName));
+                }
+                jsonObject.put(originalWord, jsonObject2);
             }
-            json.put(term, jsonTerm);
+            json.put(stemmedWord, jsonObject);
         }
 
         return json;
