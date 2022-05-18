@@ -71,7 +71,7 @@ public class QueryProcessor{
                 //System.out.println(processedMap);
                 
         
-                writeToFile(convertToJSON(processedMap).toString(), "processed.json");
+                //writeToFile(convertToJSON(processedMap).toString(), "processed.json");
                
                 return files;
     };
