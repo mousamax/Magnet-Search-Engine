@@ -16,6 +16,7 @@ CREATE TABLE CrawlerData (
 Urls nvarchar(300) COLLATE Arabic_CI_AI_KS_WS NOT NULL  PRIMARY KEY,
 CompactPages nvarchar(300) COLLATE Arabic_CI_AI_KS_WS,
 Filename nvarchar(55),
+indexed nvarchar(1)
 );
 
 CREATE TABLE UrlsToBeCrawled (
@@ -44,7 +45,7 @@ FOREIGN KEY (stemId) REFERENCES StemWords(id)
 CREATE TABLE FilesAndScores(
 Id INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
 Filename nvarchar(55),
-Score nvarchar(300),
+Score nvarchar(15),
 originalWordId int NOT NULL,
 FOREIGN KEY (originalWordId) REFERENCES OriginalWords(id)
 );
