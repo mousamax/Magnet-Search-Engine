@@ -9,10 +9,10 @@ import java.util.ArrayList;
 
 public class SearchController {
     //function take arraylist of html filename and fill up the arraylist of search result objects
-    public void fillSearchResultList(ArrayList<SearchResult> searchResultList, ArrayList<String> htmlFileNameList) {
+    public void fillSearchResultList(ArrayList<SearchResult> searchResultList, String[] htmlFileNameList) {
         DataAccess dataAccess = new DataAccess();
-        for (int i = 0; i < htmlFileNameList.size(); i++) {
-            String htmlFileName = htmlFileNameList.get(i);
+        for (int i = 0; i < htmlFileNameList.length; i++) {
+            String htmlFileName = htmlFileNameList[i];
             //get url from database where html filename is equal to the html filename column
             //remove the html extension from the filename if it is there
             String url = dataAccess.getUrl(htmlFileName);

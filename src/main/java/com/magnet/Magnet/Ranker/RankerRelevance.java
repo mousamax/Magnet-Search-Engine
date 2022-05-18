@@ -2,10 +2,7 @@ package com.magnet.Magnet.Ranker;
 
 import java.util.Comparator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.magnet.Magnet.DataAccess;
 
@@ -13,11 +10,7 @@ public class RankerRelevance {
   public static void main(String[] args) {
     // * It should be LinkedHashMap
     Map<String, Map<String, Map<String, Double>>> inputMap = new LinkedHashMap<String, Map<String, Map<String, Double>>>();
-
-    // Map<String, Map<String, Double>> mp = new LinkedHashMap<String, Map<String,
-    // Double>>();
     relevanceRanking(inputMap);
-    // relevanceRanking(mp);
   }
 
   public static Object[] relevanceRanking(Map<String, Map<String, Map<String, Double>>> inputMap) {
@@ -25,26 +18,29 @@ public class RankerRelevance {
 
     // Map<String, Map<String, Double>> mp
     // * For testing purposes
-    //Map<String, Map<String, Double>> mp = new LinkedHashMap<String, Map<String, Double>>();
-    //Map<String, Double> temp = new LinkedHashMap<String, Double>();
-//    temp.put("Example2.html", 0.2857142857142857);
-//    temp.put("Example3.html", 1.25);
-//    temp.put("Example.html", 2.2222222222222223);
-//
-//    mp.put("engine", temp);
-//
-//    Map<String, Double> temp2 = new LinkedHashMap<String, Double>();
-//    temp2.put("Example.html", 2.0);
-//    mp.put("engineer", temp2);
-//    inputMap.put("engin", mp);
+    // Map<String, Map<String, Double>> mp = new LinkedHashMap<String, Map<String,
+    // Double>>();
+    // Map<String, Double> temp = new LinkedHashMap<String, Double>();
+    // temp.put("Example2.html", 0.2857142857142857);
+    // temp.put("Example3.html", 1.25);
+    // temp.put("Example.html", 2.2222222222222223);
+    //
+    // mp.put("engine", temp);
+    //
+    // Map<String, Double> temp2 = new LinkedHashMap<String, Double>();
+    // temp2.put("Example.html", 2.0);
+    // mp.put("engineer", temp2);
+    // inputMap.put("engin", mp);
 
     // * End of test
+
     DataAccess dataAccess = new DataAccess();
     // Create a map of fileNames and popularity
     LinkedHashMap<String, Double> filenamePopularityMap = new LinkedHashMap<String, Double>();
     dataAccess.getFilenameWithPopularity(filenamePopularityMap);
     // Create a map of fileNames and list of words inside it
-    Map<String, List<String>> fileNamesMap = new LinkedHashMap<String, List<String>>();
+    // Map<String, List<String>> fileNamesMap = new LinkedHashMap<String,
+    // List<String>>();
     Map<String, Double> fileNameRelevanceMap = new LinkedHashMap<String, Double>();
     // Loop on the given map
     for (Map.Entry<String, Map<String, Map<String, Double>>> stemWord : inputMap.entrySet()) {
@@ -54,19 +50,15 @@ public class RankerRelevance {
         for (Map.Entry<String, Double> file : unstemmedWord.getValue().entrySet()) {
           // System.out.println(file);
           // Getting a list of words in each file
-          List<String> wordsList = fileNamesMap.get(file.getKey());
-          if (wordsList == null) {
+          // List<String> wordsList = fileNamesMap.get(file.getKey());
+          Double value = fileNameRelevanceMap.get(file.getKey());
+          if (value == null) {
             // Did not find the fileName
             // * Stream.collect(Collectors.toList()); This makes the list modifiable
-            // Create a list and add the to the map with fileName as the key
-            wordsList = Stream.of(unstemmedWord.getKey()).collect(Collectors.toList());
-            fileNamesMap.put(file.getKey(), wordsList);
             // Add the TF/IDF to the fileNameRelevanceMap
             fileNameRelevanceMap.put(file.getKey(), file.getValue());
           } else {
-            // Found the fileName
-            // So add the unstemmedWord to its wordsList
-            wordsList.add(unstemmedWord.getKey());
+            // Found the key
             Double previousRelevance = fileNameRelevanceMap.get(file.getKey());
             fileNameRelevanceMap.put(file.getKey(), previousRelevance + file.getValue());
           }

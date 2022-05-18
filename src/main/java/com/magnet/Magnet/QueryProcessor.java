@@ -1,8 +1,11 @@
 package com.magnet.Magnet;
 
+import com.magnet.Magnet.Ranker.RankerRelevance;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.tartarus.snowball.ext.PorterStemmer;
 
 import java.io.*;
@@ -21,15 +24,19 @@ public class QueryProcessor{
 		QueryProcessor.stopWords = QueryProcessor.loadStopwords();
         QueryProcessing(query);
     }
-    public static ArrayList<String> QueryProcessing(String query) throws IOException, JSONException, org.json.simple.parser.ParseException{
-        query = query.toLowerCase();
+    public static Object[] QueryProcessing(String query) throws IOException, JSONException, org.json.simple.parser.ParseException{
+                query = query.toLowerCase();
+                boolean isQuerySearching = true;
                 //ArrayList<String> files = getHTMLFiles(new File("./"));
                 //final map containing the needed stemmed files that will be sent to the ranker
                 Map<String, Map<String, Map<String, Double>>> processedMap = new HashMap<String, Map<String, Map<String, Double>>>();
                 
-            
+                if(query.charAt(0) == '"' || query.charAt(query.length()-1) == '"'){
+                    isQuerySearching = false;
+                    query = query.substring(1, query.length()-1);
+                }
                 //------------------phrase searching-------------------------------------
-                //Map<String, Map<String, Map<String, Double>>> phraseSearchingMap = new HashMap<String, Map<String, Map<String, Double>>>();
+                Map<String, Map<String, Map<String, Double>>> phraseSearchingMap = new HashMap<String, Map<String, Map<String, Double>>>();
                
 
                 //------------------end phrase searching-------------------------------------
@@ -64,7 +71,7 @@ public class QueryProcessor{
                                 {
                                     //phraseSearchingMap.put(queryArrayStemmed.get(i), mp.get(originalQueryArray.get(i)));
                                     //------------------phrase searching-------------------------------------
-                                    if(DocumentsContainingPhrase.containsKey(HTMLdoc.getKey()))
+                                    if(DocumentsContainingPhrase.containsKey(HTMLdoc.getKey()) && !isQuerySearching)
                                     {
                                         DocumentsContainingPhrase.replace(HTMLdoc.getKey(), DocumentsContainingPhrase.get(HTMLdoc.getKey()) + 1);
                                     }
@@ -73,16 +80,16 @@ public class QueryProcessor{
                                         DocumentsContainingPhrase.put(HTMLdoc.getKey(), 1);
                                     }
                                     //------------------end phrase searching-------------------------------------
-                                    files.add(HTMLdoc.getKey());
-                                    if(HTMLdocuments_scores.containsKey(HTMLdoc.getKey()))
-                                    {
-                                        HTMLdocuments_scores.replace(HTMLdoc.getKey(), HTMLdocuments_scores.get(HTMLdoc.getKey()) + HTMLdoc.getValue());
-                                    }
-                                    else
-                                    {
-                                        HTMLdocuments_scores.put(HTMLdoc.getKey(), HTMLdoc.getValue());
-                                    }
-                                    //processedMap.get(queryArrayStemmed.get(i)).get(originalQueryArray.get(i)).replace(HTMLdoc.getKey(), HTMLdoc.getValue() + 20);
+                                    //files.add(HTMLdoc.getKey());
+                                    // if(HTMLdocuments_scores.containsKey(HTMLdoc.getKey()))
+                                    // {
+                                    //     HTMLdocuments_scores.replace(HTMLdoc.getKey(), HTMLdocuments_scores.get(HTMLdoc.getKey()) + HTMLdoc.getValue());
+                                    // }
+                                    // else
+                                    // {
+                                    //     HTMLdocuments_scores.put(HTMLdoc.getKey(), HTMLdoc.getValue());
+                                    // }
+                                    processedMap.get(queryArrayStemmed.get(i)).get(originalQueryArray.get(i)).replace(HTMLdoc.getKey(), HTMLdoc.getValue() + 0.500);
                                 }
                         }
                         // for(int j = 0; j < originalQueryArray.size();j++){
@@ -91,29 +98,42 @@ public class QueryProcessor{
 
                     }
                 }
-                for(Map.Entry<String, Integer> HTMLdoc : DocumentsContainingPhrase.entrySet())
+                if(!isQuerySearching)
                 {
-                    if(HTMLdoc.getValue() != queryArrayStemmed.size())
-                    {
-                        //files.add(HTMLdoc.getKey());
-                        // for(int i = 0; i < queryArrayStemmed.size();i++){
-                        //     // Map<String, Map<String, Double>> temp = new HashMap<String, Map<String, Double>>();
-                        //     // temp = processedMap.get(queryArrayStemmed.get(i));
-                            
-                        //     // temp.replace(HTMLdoc, temp.get(HTMLdoc));
-                        //     // phraseSearchingMap.put(queryArrayStemmed.get(i), mp.get(queryArrayStemmed.get(i)));
-                        // }
-                        
-                        DocumentsContainingPhrase.remove(HTMLdoc.getKey());
+
+                    for(int i = 0; i < queryArrayStemmed.size();i++){
+                        Map<String, Double> temp = new HashMap<String, Double>();
+                        Map<String, Map<String, Double>> temp2 = new HashMap<String, Map<String, Double>>();
+                        temp2.put(originalQueryArray.get(i),temp);
+                        phraseSearchingMap.put(queryArrayStemmed.get(i), temp2);
+                        for(Map.Entry<String, Integer> HTMLdoc : DocumentsContainingPhrase.entrySet())
+                        {
+                            if(HTMLdoc.getValue() == queryArrayStemmed.size())
+                            {
+                                // Read file from given filename
+                                File input = new File("./html_files/" + HTMLdoc.getKey() + ".html");
+                                // Use Jsoup to parse the file
+                                Document doc = Jsoup.parse(input, "UTF-8", "");
+                                System.out.println(doc.body().text().equals(query));
+                                if(doc.body().text().contains(query) || doc.title().contains(query)){
+    
+                                    Double val = mp.get(queryArrayStemmed.get(i)).get(originalQueryArray.get(i)).get(HTMLdoc.getKey());
+                                    phraseSearchingMap.get(queryArrayStemmed.get(i)).get(originalQueryArray.get(i)).put(HTMLdoc.getKey(), val);
+                                }
+                            }
+                        }
                     }
+                    return RankerRelevance.relevanceRanking(phraseSearchingMap);
+                }
+                else {
+                    return RankerRelevance.relevanceRanking(processedMap);
                 }
                 
-                System.out.println(processedMap);
-                System.out.println(DocumentsContainingPhrase);
-        
+
+
                 //writeToFile(convertToJSON(processedMap).toString(), "processed.json");
-               
-                return files;
+               //call ranker
+       
     };
 
     public static Map<String, Map<String, Map<String, Double>>> ToPhraseSearching(String query) throws IOException, JSONException, org.json.simple.parser.ParseException{
