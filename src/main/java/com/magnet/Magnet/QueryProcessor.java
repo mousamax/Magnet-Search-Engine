@@ -25,12 +25,16 @@ public class QueryProcessor{
         QueryProcessing(query);
     }
     public static Object[] QueryProcessing(String query) throws IOException, JSONException, org.json.simple.parser.ParseException{
-        query = query.toLowerCase();
+                query = query.toLowerCase();
+                boolean isQuerySearching = true;
                 //ArrayList<String> files = getHTMLFiles(new File("./"));
                 //final map containing the needed stemmed files that will be sent to the ranker
                 Map<String, Map<String, Map<String, Double>>> processedMap = new HashMap<String, Map<String, Map<String, Double>>>();
                 
-            
+                if(query.charAt(0) == '"' || query.charAt(query.length()-1) == '"'){
+                    isQuerySearching = false;
+                    query = query.substring(1, query.length()-1);
+                }
                 //------------------phrase searching-------------------------------------
                 Map<String, Map<String, Map<String, Double>>> phraseSearchingMap = new HashMap<String, Map<String, Map<String, Double>>>();
                
@@ -94,39 +98,42 @@ public class QueryProcessor{
 
                     }
                 }
+                if(!isQuerySearching)
+                {
 
-                for(int i = 0; i < queryArrayStemmed.size();i++){
-                    Map<String, Double> temp = new HashMap<String, Double>();
-                    Map<String, Map<String, Double>> temp2 = new HashMap<String, Map<String, Double>>();
-                    temp2.put(originalQueryArray.get(i),temp);
-                    phraseSearchingMap.put(queryArrayStemmed.get(i), temp2);
-                    for(Map.Entry<String, Integer> HTMLdoc : DocumentsContainingPhrase.entrySet())
-                    {
-                        if(HTMLdoc.getValue() == queryArrayStemmed.size())
+                    for(int i = 0; i < queryArrayStemmed.size();i++){
+                        Map<String, Double> temp = new HashMap<String, Double>();
+                        Map<String, Map<String, Double>> temp2 = new HashMap<String, Map<String, Double>>();
+                        temp2.put(originalQueryArray.get(i),temp);
+                        phraseSearchingMap.put(queryArrayStemmed.get(i), temp2);
+                        for(Map.Entry<String, Integer> HTMLdoc : DocumentsContainingPhrase.entrySet())
                         {
-                            // Read file from given filename
-                            File input = new File("./html_files/" + HTMLdoc.getKey() + ".html");
-                            // Use Jsoup to parse the file
-                            Document doc = Jsoup.parse(input, "UTF-8", "");
-                            System.out.println(doc.body().text().equals(query));
-                            if(doc.body().text().contains(query) || doc.title().contains(query)){
-
-                                Double val = mp.get(queryArrayStemmed.get(i)).get(originalQueryArray.get(i)).get(HTMLdoc.getKey());
-                                phraseSearchingMap.get(queryArrayStemmed.get(i)).get(originalQueryArray.get(i)).put(HTMLdoc.getKey(), val);
+                            if(HTMLdoc.getValue() == queryArrayStemmed.size())
+                            {
+                                // Read file from given filename
+                                File input = new File("./html_files/" + HTMLdoc.getKey() + ".html");
+                                // Use Jsoup to parse the file
+                                Document doc = Jsoup.parse(input, "UTF-8", "");
+                                System.out.println(doc.body().text().equals(query));
+                                if(doc.body().text().contains(query) || doc.title().contains(query)){
+    
+                                    Double val = mp.get(queryArrayStemmed.get(i)).get(originalQueryArray.get(i)).get(HTMLdoc.getKey());
+                                    phraseSearchingMap.get(queryArrayStemmed.get(i)).get(originalQueryArray.get(i)).put(HTMLdoc.getKey(), val);
+                                }
                             }
                         }
                     }
+                    return RankerRelevance.relevanceRanking(phraseSearchingMap);
+                }
+                else {
+                    return RankerRelevance.relevanceRanking(processedMap);
                 }
                 
-                System.out.println(processedMap);
-                System.out.println(DocumentsContainingPhrase);
-                System.out.println(HTMLdocuments_scores);
-                System.out.println(phraseSearchingMap);
 
 
                 //writeToFile(convertToJSON(processedMap).toString(), "processed.json");
                //call ranker
-        return RankerRelevance.relevanceRanking(processedMap);
+       
     };
 
     public static Map<String, Map<String, Map<String, Double>>> ToPhraseSearching(String query) throws IOException, JSONException, org.json.simple.parser.ParseException{
