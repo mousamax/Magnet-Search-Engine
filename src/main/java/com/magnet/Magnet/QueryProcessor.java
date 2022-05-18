@@ -48,8 +48,9 @@ public class QueryProcessor{
                     }   
                 }
                 //System.out.println(queryArrayStemmed);
-        ArrayList<String> files = new ArrayList<String>();
-                Map<String, Integer> phraseDocuments = new HashMap<String, Integer>();
+
+                ArrayList<String> files = new ArrayList<String>();
+                Map<String, Integer> DocumentsContainingPhrase = new HashMap<String, Integer>();
                 for(int i = 0; i < queryArrayStemmed.size();i++){
                     
                     if(mp.containsKey(queryArrayStemmed.get(i))){
@@ -58,14 +59,15 @@ public class QueryProcessor{
                         if(mp.get(queryArrayStemmed.get(i)).containsKey(originalQueryArray.get(i))){
                             for(Map.Entry<String, Double> HTMLdoc : mp.get(queryArrayStemmed.get(i)).get(originalQueryArray.get(i)).entrySet())
                                 {
+                                    //phraseSearchingMap.put(queryArrayStemmed.get(i), mp.get(originalQueryArray.get(i)));
                                     //------------------phrase searching-------------------------------------
-                                    if(phraseDocuments.containsKey(HTMLdoc.getKey()))
+                                    if(DocumentsContainingPhrase.containsKey(HTMLdoc.getKey()))
                                     {
-                                        phraseDocuments.replace(HTMLdoc.getKey(), phraseDocuments.get(HTMLdoc.getKey()) + 1);
+                                        DocumentsContainingPhrase.replace(HTMLdoc.getKey(), DocumentsContainingPhrase.get(HTMLdoc.getKey()) + 1);
                                     }
                                     else
                                     {
-                                        phraseDocuments.put(HTMLdoc.getKey(), 1);
+                                        DocumentsContainingPhrase.put(HTMLdoc.getKey(), 1);
                                     }
                                     //------------------end phrase searching-------------------------------------
                                     files.add(HTMLdoc.getKey());
@@ -76,10 +78,27 @@ public class QueryProcessor{
                         // for(int j = 0; j < originalQueryArray.size();j++){
                             
                         // }
+
                     }
                 }
-                //System.out.println(processedMap);
-                //System.out.println(phraseDocuments);
+                for(Map.Entry<String, Integer> HTMLdoc : DocumentsContainingPhrase.entrySet())
+                {
+                    if(HTMLdoc.getValue() == queryArrayStemmed.size())
+                    {
+                        //files.add(HTMLdoc.getKey());
+                        for(int i = 0; i < queryArrayStemmed.size();i++){
+                            // Map<String, Map<String, Double>> temp = new HashMap<String, Map<String, Double>>();
+                            // temp = processedMap.get(queryArrayStemmed.get(i));
+                            
+                            // temp.replace(HTMLdoc, temp.get(HTMLdoc));
+                            // phraseSearchingMap.put(queryArrayStemmed.get(i), mp.get(queryArrayStemmed.get(i)));
+                        }
+                        
+                    }
+                }
+                
+                System.out.println(processedMap);
+                System.out.println(DocumentsContainingPhrase);
         
                 //writeToFile(convertToJSON(processedMap).toString(), "processed.json");
                
