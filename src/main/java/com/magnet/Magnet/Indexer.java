@@ -141,6 +141,10 @@ public class Indexer {
 
         // Loop on title words and add them to the map
         for (String word : titleWords) {
+            
+            //Convert word to lowercase
+            word = word.toLowerCase();
+            
             // Stemming
             word = stemming(word);
 
@@ -186,6 +190,10 @@ public class Indexer {
 
         // Loop on body words and add them to the map
         for (String word : bodyWords) {
+            
+            //Convert word to lowercase
+            word = word.toLowerCase();
+            
             // Stemming
             word = stemming(word);
 
@@ -402,6 +410,19 @@ public class Indexer {
             stopwordsSet.add(s);
         }
         br.close();
+
+        stopwordsSet.add("*");
+        stopwordsSet.add("/");
+        stopwordsSet.add("\\");
+        stopwordsSet.add("$");
+        stopwordsSet.add("^");
+        stopwordsSet.add("#");
+        stopwordsSet.add("@");
+        stopwordsSet.add("!");
+        stopwordsSet.add("&");
+        stopwordsSet.add("-");
+
+
         return stopwordsSet;
     }
 
