@@ -141,6 +141,15 @@ public class Indexer {
         // Loop on title words and add them to the map
         for (String word : titleWords) {
 
+            // Remove single quotes
+            word = word.replace("'", "");
+
+            // Remove double quotes
+            word = word.replace("\"", "");
+
+            // Remove punctuation
+            word = word.replaceAll("[^a-zA-Z0-9]", "");
+
             // Convert word to lowercase
             word = word.toLowerCase();
 
@@ -231,7 +240,14 @@ public class Indexer {
 
         // Loop on title words and add them to the map
         for (String word : bodyWords) {
+            // Remove single quotes
+            word = word.replace("'", "");
 
+            // Remove double quotes
+            word = word.replace("\"", "");
+
+            // Remove punctuation
+            word = word.replaceAll("[^a-zA-Z0-9]", "");
             // Convert word to lowercase
             word = word.toLowerCase();
 
@@ -636,20 +652,19 @@ public class Indexer {
     public static void calculateIDF_DB(DataAccess dataAccess, int numbeOfDocuments) {
         // Calculate IDF
 
-        //Get all terms
+        // Get all terms
         HashMap<Integer, Integer> terms = dataAccess.getAllTermsAndNumberOfDocuments();
 
-        //for each term
-        for (Integer termId: terms.keySet())
-        {
-            
-            //calculate the idf
-            double idf = Math.log10((double)numbeOfDocuments / (double)terms.get(termId));
+        // for each term
+        for (Integer termId : terms.keySet()) {
 
-            //update the idf in the database
+            // calculate the idf
+            double idf = Math.log10((double) numbeOfDocuments / (double) terms.get(termId));
+
+            // update the idf in the database
             dataAccess.setIDF(termId, idf);
         }
-        
+
     }
 
     public static Map<String, Map<String, Double>> calculateIDF(Map<String, Map<String, Double>> mp,
