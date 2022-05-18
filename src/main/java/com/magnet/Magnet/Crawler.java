@@ -154,9 +154,7 @@ public class Crawler implements Runnable {
                         }
                     }
                 }
-                //add urls to database if size is greater than 0
-                if(urlsTobeSentToDB.size() > 0)
-                    dataAccess.addUrlsToBeCrawled(urlsTobeSentToDB, url);
+                dataAccess.addUrlsToBeCrawled(urlsTobeSentToDB, url);
             }
         }
     }
@@ -165,13 +163,14 @@ public class Crawler implements Runnable {
         Elements lang = doc.select("html[lang]");
         if(lang.size() > 0) {
             String langCode = lang.attr("lang");
-            if(!langCode.equals("en")) {
+            //check if langCode contains "en"
+            if(!langCode.contains("en")) {
                 return false;
             }
             return true;
         }
         LanguageResult result = detector.detect(doc.body().text().substring(0, Math.min(doc.body().text().length(), 100)));
-        if(!result.getLanguage().equals("en")) {
+        if(!result.getLanguage().contains("en")) {
             return false;
         }
         return true;
