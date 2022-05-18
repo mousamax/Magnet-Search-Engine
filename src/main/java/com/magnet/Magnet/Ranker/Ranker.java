@@ -98,7 +98,7 @@ public class Ranker {
         ConcurrentHashMap<String, Double> urlPopularityMap = new ConcurrentHashMap<String, Double>();
         dataAccess.getRelatedUrls(urlsPointingToMe, urlsCountMap, urlPopularityMap, totalLinksNum);
         Double dampingFactor = 0.85; // which is the click-through probability
-        Integer constIteration = 2; // ? Check the constant number of iteration on pageRank algorithm
+        Integer constIteration = 1; // ? Check the constant number of iteration on pageRank algorithm
         // TODO Remove printing below
         // System.out.println(urlsPointingToMe);
         // System.out.println(urlsCountMap);
@@ -137,8 +137,7 @@ public class Ranker {
 
         }
         System.out.println("After algorithm: " + urlPopularityMap);
-        // TODO use the urlPopularityMap to input the popularity in the database
-        // dataAccess.addUrlsPopularity(urlPopularityMap);
+        // Adding the popularity in the database
         System.out.println("Threading will start\n");
         int threadsNum = 2;
         // create number of threads

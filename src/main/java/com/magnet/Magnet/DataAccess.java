@@ -204,48 +204,7 @@ public class DataAccess {
     }
 
 
-    // ? Check if we need to change the query as we will use the IDs
-    public void getRelatedUrls(ConcurrentHashMap<String, List<String>> urlsPointingToMe,
-            ConcurrentHashMap<String, Integer> urlsCountMap, ConcurrentHashMap<String, Double> urlPopularityMap,
-            int totalLinksNum) {
-        try {
-            // Obtain a statement
-            Statement st = connection.createStatement();
-            String query = "Select * FROM UrlAndInnerUrls";
-            // Execute the query
-            ResultSet rs = st.executeQuery(query);
-            // Store the urls and innerUrl in the Maps
-            while (rs.next()) {
-                // add to the urlsPointingToMe
-                List<String> urlList = urlsPointingToMe.get(rs.getString("InnerUrl"));
-                if (urlList == null) {
-                    // Did not find the InnerUrl before
-                    // * Stream.collect(Collectors.toList()); This makes the list modifiable
-                    // Initialize the list with the first Url
-                    urlList = Stream.of(rs.getString("Url")).collect(Collectors.toList());
-                    // Add list of Urls to the map with InnerUrl as the key
-                    urlsPointingToMe.put(rs.getString("InnerUrl"), urlList);
-                    // Assign initial popularity
-                    Double popu = 1.0 / totalLinksNum;
-                    urlPopularityMap.put(rs.getString("InnerUrl"), popu);
-                } else {
-                    // Found the InnerUrl
-                    // So add the url to its urlList
-                    urlList.add(rs.getString("Url"));
-                }
-
-                Integer numberOfUrlsIamPointingTo = urlsCountMap.get(rs.getString("Url"));
-                if (numberOfUrlsIamPointingTo == null) {
-                    // Did not find the Url
-                    urlsCountMap.put(rs.getString("Url"), 1);
-                } else {
-                    // Found the Url
-                    // So increment the numberOfUrlsIamPointingTo
-                    urlsCountMap.put(rs.getString("Url"), numberOfUrlsIamPointingTo + 1);
-                }
-            }
-        } catch (SQLException e) { }
-    }
+    
     //getNumOfCrawledFiles from the database table "CrawlerData" count "filename" column
     public int getNumOfCrawledFiles() {
         int num = 0;
@@ -412,6 +371,50 @@ public class DataAccess {
         }
         return stemId;
     }
+    // START OF RANKER QUERIES
+
+    // ? Check if we need to change the query as we will use the IDs
+    public void getRelatedUrls(ConcurrentHashMap<String, List<String>> urlsPointingToMe,
+            ConcurrentHashMap<String, Integer> urlsCountMap, ConcurrentHashMap<String, Double> urlPopularityMap,
+            int totalLinksNum) {
+        try {
+            // Obtain a statement
+            Statement st = connection.createStatement();
+            String query = "SELECT CD.Urls as Url, H.InnerUrl FROM CrawlerData CD, HyperLinks H WHERE CD.Id = H.UrlId";
+            // Execute the query
+            ResultSet rs = st.executeQuery(query);
+            // Store the urls and innerUrl in the Maps
+            while (rs.next()) {
+                // add to the urlsPointingToMe
+                List<String> urlList = urlsPointingToMe.get(rs.getString("InnerUrl"));
+                if (urlList == null) {
+                    // Did not find the InnerUrl before
+                    // * Stream.collect(Collectors.toList()); This makes the list modifiable
+                    // Initialize the list with the first Url
+                    urlList = Stream.of(rs.getString("Url")).collect(Collectors.toList());
+                    // Add list of Urls to the map with InnerUrl as the key
+                    urlsPointingToMe.put(rs.getString("InnerUrl"), urlList);
+                    // Assign initial popularity
+                    Double popu = 1.0 / totalLinksNum;
+                    urlPopularityMap.put(rs.getString("InnerUrl"), popu);
+                } else {
+                    // Found the InnerUrl
+                    // So add the url to its urlList
+                    urlList.add(rs.getString("Url"));
+                }
+
+                Integer numberOfUrlsIamPointingTo = urlsCountMap.get(rs.getString("Url"));
+                if (numberOfUrlsIamPointingTo == null) {
+                    // Did not find the Url
+                    urlsCountMap.put(rs.getString("Url"), 1);
+                } else {
+                    // Found the Url
+                    // So increment the numberOfUrlsIamPointingTo
+                    urlsCountMap.put(rs.getString("Url"), numberOfUrlsIamPointingTo + 1);
+                }
+            }
+        } catch (SQLException e) { }
+    }
 
     // get count of all the urls in the database table "CrawlerData"
     public int getCountOfUrls() {
@@ -419,7 +422,7 @@ public class DataAccess {
         try {
             // Obtain a statement
             Statement st = connection.createStatement();
-            String query = "SELECT COUNT(*) FROM CrawlerData;";
+            String query = "SELECT COUNT (DISTINCT InnerUrl) AS 'COUNT' FROM HyperLinks;";
             // Execute the query
             ResultSet rs = st.executeQuery(query);
             while (rs.next()) {
@@ -430,9 +433,6 @@ public class DataAccess {
         }
         return count;
     }
-    // public void addUrlsPopularity(ConcurrentHashMap<String, Double>
-    // urlPopularityMap, String[] urlsArray, Double[] popularitiesArray, int start,
-    // int end) {
 
     // Update Urls Popularity
     public void addUrlsPopularity(String[] urlsArray, Double[] popularitiesArray, int start, int end) {
@@ -456,7 +456,7 @@ public class DataAccess {
             int count = st.executeUpdate(query);
         } catch (SQLException e) { }
     }
-
+    // END OF RANKER QUERIES
     // Add fileName and score to table "FilesAndScores" and return its id
     // given an originalWordId
     public int addFile(String fileName, double score, int originalWordId) {
