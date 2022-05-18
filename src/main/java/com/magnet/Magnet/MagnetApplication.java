@@ -16,7 +16,8 @@ import java.util.ArrayList;
 @SpringBootApplication
 @Controller
 public class MagnetApplication {
-
+	ArrayList<String> fileNames;
+	ArrayList<SearchResult> results;
 	public static void main(String[] args) {
 		SpringApplication.run(MagnetApplication.class, args);
 	}
@@ -32,18 +33,21 @@ public class MagnetApplication {
 	@GetMapping("/result")
 	public String result(@RequestParam(name = "query", defaultValue = "") String query,
 						 @RequestParam(name = "pageNum", defaultValue = "1") int pageNum, Model model) throws IOException, ParseException {
-		//TODO Submit query to the database
-		DataAccess dataAccess = new DataAccess();
-		dataAccess.addQuery(query);
-		//Get all queries
-		ArrayList<String> pastQueries = dataAccess.getQueries();
-		// TODO send query to query processor
-		ArrayList<String> fileNames = QueryProcessor.QueryProcessing(query);
-		// query processor return list of urls or filenames
-		// TODO parse list of filenames to list of magnet links
-		ArrayList<SearchResult> results = new ArrayList<>();
-		SearchController searchController = new SearchController();
-		searchController.fillSearchResultList(results, fileNames);
+		if(pageNum == 1)
+		{
+			//TODO Submit query to the database
+			DataAccess dataAccess = new DataAccess();
+			dataAccess.addQuery(query);
+			//Get all queries
+			ArrayList<String> pastQueries = dataAccess.getQueries();
+			// TODO send query to query processor
+			fileNames = QueryProcessor.QueryProcessing(query);
+			// query processor return list of urls or filenames
+			// TODO parse list of filenames to list of magnet links
+			SearchController searchController = new SearchController();
+			results = new ArrayList<>();
+			searchController.fillSearchResultList(results, fileNames);
+		}
 		model.addAttribute("query", query);
 		// create list of page numbers to be displayed in the pagination 10 per page
 		int pageCount = results.size() / 10;
@@ -54,7 +58,6 @@ public class MagnetApplication {
 		for (int i = 1; i <= pageCount; i++) {
 			pageNumbers.add(i);
 		}
-
 		model.addAttribute("pageNumbers", pageNumbers);
 		model.addAttribute("currentPageNum", pageNum);
 		//send only 10 results per pageNum request

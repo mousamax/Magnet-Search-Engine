@@ -60,7 +60,7 @@ public class QueryProcessor{
                                 {
                                     files.add(HTMLdoc.getKey());
                                     double val = 0.2;
-                                    processedMap.get(entry.getKey()).get(originalWord.getKey()).replace(HTMLdoc.getKey(), HTMLdoc.getValue() + val);
+                                    //processedMap.get(entry.getKey()).get(originalWord.getKey()).replace(HTMLdoc.getKey(), HTMLdoc.getValue() + val);
                                 }
                             }
                         }
