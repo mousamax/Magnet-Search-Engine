@@ -15,7 +15,6 @@ public class Indexer {
 
     public static void main(String[] args) throws JSONException, IOException, ParseException {
 
-        DataAccess dataAccess = new DataAccess();
         int choice;
         Scanner sc = new Scanner(System.in);
         System.out
@@ -26,28 +25,27 @@ public class Indexer {
             choice = sc.nextInt();
         }
         System.out.println(
-                "\u001B[35m" + "Are the HTML files in arabic or english ?\n1.Arabic\n2.English");
+                "\u001B[35m" + "Are the HTML files in arabic or english ?\n1.Arabic\n2.English\n3.Both");
+        sc.nextInt();
         Set<String> stopWords = loadStopwords();
         if (choice == 1) {
 
             // Key: Term
             // Value: Map with: Key: filename , Value: Term Frequency
-            // Map<String, Map<String, Double>> mp = new HashMap<String, Map<String,
-            // Double>>();
+            Map<String, Map<String, Double>> mp = new HashMap<String, Map<String, Double>>();
             ArrayList<String> files = getHTMLFiles(new File("./html_files"));
 
             int numberOfDocuments = files.size();
             System.out.println("\u001B[34m" + "Number of documents: " + numberOfDocuments + "\u001B[0m");
 
             for (String fileName : files) {
-                // mp = readHTMLFile(fileName, stopWords, mp);
-                readHTMLFileDB(fileName, stopWords, dataAccess);
+                mp = readHTMLFile(fileName, stopWords, mp);
             }
 
-            // writeToFile(convertToJSON(mp).toString(), "index.json");
+            writeToFile(convertToJSON(mp).toString(), "index.json");
             System.out.println("--------------------------------");
             System.out.println(
-                    "\u001B[32m" + "Finished indexing all files\nOutput of the indexer is in the DB"
+                    "\u001B[32m" + "Finished indexing all files\nOutput of the indexer is written in index.json"
                             + "\u001B[0m");
         } else {
             String HTMLFileName;
@@ -113,213 +111,6 @@ public class Indexer {
         }
         br.close();
         return sb.toString();
-    }
-
-    public static void readHTMLFileDB(String fileName, Set<String> stopWords, DataAccess dataAccess)
-            throws IOException {
-
-        // Define scores for terms in title and in body
-        Double titleScore = 2.0;
-        Double bodyScore = 1.0;
-        // Read file from given filename
-        File input = new File("./html_files/" + fileName);
-        // Use Jsoup to parse the file
-        Document doc = Jsoup.parse(input, "UTF-8", "");
-        // Remove .html from the file name
-        fileName = fileName.substring(0, fileName.length() - 5);
-        // Save the title in a string
-        String title = doc.title();
-        // Save the body text in a string
-        String body = doc.body().text();
-        // Get an array of body words
-        String[] bodyWords = body.split(" ");
-        // Get an array of title words
-        String[] titleWords = title.split(" ");
-        // Calculate docLength, will be used to calculate the normalized TF
-        Integer docLength = bodyWords.length + titleWords.length;
-
-        // Loop on title words and add them to the map
-        for (String word : titleWords) {
-
-            // Convert word to lowercase
-            word = word.toLowerCase();
-
-            // Remove stop words
-            if (stopWords.contains(word)) {
-                continue;
-            }
-
-            // Stemming
-            String stemmedWord = stemming(word);
-
-            // Check if the stemmed term is in the DB
-            // Get the stem id
-            int stemId = dataAccess.getStemTermId(stemmedWord);
-            if (stemId == -1) {
-                // Stemmed Term is not in DB
-
-                // Add the stemmed term to the DB
-                stemId = dataAccess.addStemTerm(stemmedWord);
-
-                // Add original word to DB
-                int originalWordId = dataAccess.addOriginalWord(word, stemId);
-
-                // Add file to DB
-
-                dataAccess.addFile(fileName, titleScore / docLength, originalWordId);
-
-                // Increment the number of documents for the stemmed term
-                dataAccess.incrementNumberOfDocuments(stemId);
-
-            } else {
-
-                // Stemmed word is in DB
-
-                // Check if the original term is in the DB
-                // Get the original word id
-                int originalWordId = dataAccess.getOriginalWordId(word);
-                if (originalWordId == -1) {
-                    // Original Term is not in DB
-
-                    // Get the stem id
-                    stemId = dataAccess.getStemTermId(stemmedWord);
-
-                    // Add original word to DB
-                    originalWordId = dataAccess.addOriginalWord(word, stemId);
-
-                    // Add file to DB
-                    dataAccess.addFile(fileName, titleScore / docLength, originalWordId);
-
-                    // Increment the number of documents for the stemmed term
-                    dataAccess.incrementNumberOfDocuments(stemId);
-
-                } else {
-                    // Original Term is in DB
-
-                    // Get the original word id
-                    originalWordId = dataAccess.getOriginalWordId(word);
-
-                    // Get the file id
-                    int fileId = dataAccess.getFileId(fileName, originalWordId);
-
-                    // Check if the file is in the DB
-                    if (fileId == -1) {
-                        // File is not in DB
-
-                        // Add file to DB
-                        fileId = dataAccess.addFile(fileName, titleScore / docLength, originalWordId);
-
-                        // Increment the number of documents for the stemmed term
-                        dataAccess.incrementNumberOfDocuments(stemId);
-
-                    } else {
-                        // File is in DB
-
-                        // Get the file TF
-                        Double score = dataAccess.getScore(fileId);
-
-                        // Update the file TF
-                        dataAccess.updateFileScore(fileId, score + titleScore / docLength);
-
-                    }
-
-                }
-
-            }
-
-        }
-
-        // Loop on title words and add them to the map
-        for (String word : bodyWords) {
-
-            // Convert word to lowercase
-            word = word.toLowerCase();
-
-            // Remove stop words
-            if (stopWords.contains(word)) {
-                continue;
-            }
-
-            // Stemming
-            String stemmedWord = stemming(word);
-
-            // Check if the stemmed term is in the DB
-            // Get the stem id
-            int stemId = dataAccess.getStemTermId(stemmedWord);
-            if (stemId == -1) {
-                // Stemmed Term is not in DB
-
-                // Add the stemmed term to the DB
-                stemId = dataAccess.addStemTerm(stemmedWord);
-
-                // Add original word to DB
-                int originalWordId = dataAccess.addOriginalWord(word, stemId);
-
-                // Add file to DB
-
-                dataAccess.addFile(fileName, bodyScore / docLength, originalWordId);
-
-                // Increment the number of documents for the stemmed term
-                dataAccess.incrementNumberOfDocuments(stemId);
-
-            } else {
-
-                // Stemmed word is in DB
-
-                // Check if the original term is in the DB
-                // Get the original word id
-                int originalWordId = dataAccess.getOriginalWordId(word);
-                if (originalWordId == -1) {
-                    // Original Term is not in DB
-
-                    // Get the stem id
-                    stemId = dataAccess.getStemTermId(stemmedWord);
-
-                    // Add original word to DB
-                    originalWordId = dataAccess.addOriginalWord(word, stemId);
-
-                    // Add file to DB
-                    dataAccess.addFile(fileName, bodyScore / docLength, originalWordId);
-
-                    // Increment the number of documents for the stemmed term
-                    dataAccess.incrementNumberOfDocuments(stemId);
-
-                } else {
-                    // Original Term is in DB
-
-                    // Get the original word id
-                    originalWordId = dataAccess.getOriginalWordId(word);
-
-                    // Get the file id
-                    int fileId = dataAccess.getFileId(fileName, originalWordId);
-
-                    // Check if the file is in the DB
-                    if (fileId == -1) {
-                        // File is not in DB
-
-                        // Add file to DB
-                        fileId = dataAccess.addFile(fileName, bodyScore / docLength, originalWordId);
-
-                        // Increment the number of documents for the stemmed term
-                        dataAccess.incrementNumberOfDocuments(stemId);
-
-                    } else {
-                        // File is in DB
-
-                        // Get the file TF
-                        Double score = dataAccess.getScore(fileId);
-
-                        // Update the file TF
-                        dataAccess.updateFileScore(fileId, score + bodyScore / docLength);
-
-                    }
-
-                }
-
-            }
-
-        }
-
     }
 
     public static Map<String, Map<String, Double>> readHTMLFile(String fileName, Set<String> stopWords,
@@ -631,25 +422,6 @@ public class Indexer {
         stopwordsSet.add("-");
 
         return stopwordsSet;
-    }
-
-    public static void calculateIDF_DB(DataAccess dataAccess, int numbeOfDocuments) {
-        // Calculate IDF
-
-        //Get all terms
-        HashMap<Integer, Integer> terms = dataAccess.getAllTermsAndNumberOfDocuments();
-
-        //for each term
-        for (Integer termId: terms.keySet())
-        {
-            
-            //calculate the idf
-            double idf = Math.log10((double)numbeOfDocuments / (double)terms.get(termId));
-
-            //update the idf in the database
-            dataAccess.setIDF(termId, idf);
-        }
-        
     }
 
     public static Map<String, Map<String, Double>> calculateIDF(Map<String, Map<String, Double>> mp,
