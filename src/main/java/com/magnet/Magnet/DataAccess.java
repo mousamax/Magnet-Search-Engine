@@ -3,6 +3,7 @@ package com.magnet.Magnet;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -79,6 +80,7 @@ public class DataAccess {
             e.printStackTrace();
         }
     }
+
     // add UrlsToBeCrawled array to the database table "UrlsToBeCrawled"
     public void addUrlsToBeCrawled(ConcurrentHashMap<String, Boolean> urlsToBeCrawled, String Url) {
         try {
@@ -96,16 +98,18 @@ public class DataAccess {
             // "UrlsToBeCrawled"
             String queryTobeCrawled = "";
             String queryToHyperLinks = "";
-            for (String HyperLink : urlsToBeCrawled.keySet()) {
-                queryTobeCrawled += "INSERT INTO UrlsToBeCrawled (Urls) Select N'" + HyperLink + "' ;";
-                queryToHyperLinks += "INSERT INTO HyperLinks (UrlId,InnerUrl) Select "+ urlID +" , N'" + HyperLink + "' ;";
+
+            for (String url : urlsToBeCrawled.keySet()) {
+                queryTobeCrawled += "INSERT INTO UrlsToBeCrawled (Urls) Select N'" + url + "' ;";
+                queryToHyperLinks += "INSERT INTO HyperLinks (UrlId,InnerUrl) Select " + urlID + " , N'" + url + "' ;";
             }
             // Execute the query
             int count = st.executeUpdate(queryTobeCrawled);
             Statement st2 = connection.createStatement();
             int count2 = st2.executeUpdate(queryToHyperLinks);
         } catch (SQLException e) {
-            System.out.println("ignored duplicate url");}
+            System.out.println("ignored duplicate url");
+        }
     }
 
     // retrieve all the urls to be crawled from the database table "UrlsToBeCrawled"
@@ -205,9 +209,8 @@ public class DataAccess {
         }
     }
 
-
-    
-    //getNumOfCrawledFiles from the database table "CrawlerData" count "filename" column
+    // getNumOfCrawledFiles from the database table "CrawlerData" count "filename"
+    // column
     public int getNumOfCrawledFiles() {
         int num = 0;
         try {
@@ -219,10 +222,11 @@ public class DataAccess {
             while (rs.next()) {
                 num = rs.getInt("count");
             }
+        } catch (SQLException e) {
         }
-        catch (SQLException e) {}
         return num;
     }
+
     // add query to the database table "SearchData" for a given query
     public void addQuery(String query) {
         try {
@@ -235,8 +239,8 @@ public class DataAccess {
         }
     }
 
-    //get all non-indexed files from table "CrawlerData"
-    //return an array list
+    // get all non-indexed files from table "CrawlerData"
+    // return an array list
     public ArrayList<String> getNonIndexedFiles() {
         ArrayList<String> nonIndexedFiles = new ArrayList<String>();
         try {
@@ -253,6 +257,7 @@ public class DataAccess {
         }
         return nonIndexedFiles;
     }
+
     // markFileAsIndexed in the database table "CrawlerData" in column "INDEXED"
     public void markFileAsIndexed(String filename) {
         try {
@@ -261,10 +266,12 @@ public class DataAccess {
             String query = "UPDATE CrawlerData SET INDEXED = 1 WHERE FILENAME = N'" + filename + "';";
             // Execute the query
             int count = st.executeUpdate(query);
-        } catch (SQLException e) { }
+        } catch (SQLException e) {
+        }
     }
-    //Select all from the database table "SearchData"
-    //return in a list
+
+    // Select all from the database table "SearchData"
+    // return in a list
     public ArrayList<String> getQueries() {
         ArrayList<String> queries = new ArrayList<String>();
         try {
@@ -280,7 +287,7 @@ public class DataAccess {
         }
         return queries;
     }
-    
+
     // getUrl from the database table "CrawlerData" for a file name
     public String getUrl(String fileName) {
         try {
@@ -320,7 +327,7 @@ public class DataAccess {
                 return id;
             }
         } catch (SQLException e) {
-            //print query
+            // print query
             System.out.println("getStemTermId:" + query);
         }
         return -1;
@@ -401,7 +408,8 @@ public class DataAccess {
         try {
             // Obtain a statement
             Statement st = connection.createStatement();
-            String query = "INSERT INTO OriginalWords (OriginalWord, StemId) VALUES (N'" + originalWord + "', " + stemId + ");";
+            String query = "INSERT INTO OriginalWords (OriginalWord, StemId) VALUES (N'" + originalWord + "', " + stemId
+                    + ");";
             // Execute the query
             int count = st.executeUpdate(query);
             // Obtain a statement
@@ -422,7 +430,6 @@ public class DataAccess {
     }
     // START OF RANKER QUERIES
 
-    // ? Check if we need to change the query as we will use the IDs
     public void getRelatedUrls(ConcurrentHashMap<String, List<String>> urlsPointingToMe,
             ConcurrentHashMap<String, Integer> urlsCountMap, ConcurrentHashMap<String, Double> urlPopularityMap,
             int totalLinksNum) {
@@ -462,7 +469,8 @@ public class DataAccess {
                     urlsCountMap.put(rs.getString("Url"), numberOfUrlsIamPointingTo + 1);
                 }
             }
-        } catch (SQLException e) { }
+        } catch (SQLException e) {
+        }
     }
 
     // get count of all the urls in the database table "CrawlerData"
@@ -489,22 +497,35 @@ public class DataAccess {
             // Obtain a statement
             Statement st = connection.createStatement();
             // insert the map of urls to be crawled into the database table
-            // "UrlsToBeCrawled"
             String query = "";
             // UPDATE CrawlerData SET Popularity = 2.0202 WHERE Urls='A';
             for (int i = start; i < end; i++) {
                 query += "UPDATE CrawlerData SET Popularity = " + popularitiesArray[i] +
                         " WHERE Urls='" + urlsArray[i] + "';";
             }
-            // for (ConcurrentHashMap.Entry<String, Double> url :
-            // urlPopularityMap.entrySet()) {
-            // query += "UPDATE CrawlerData SET Popularity = " + url.getValue() +
-            // " WHERE Urls='" + url.getKey() + "';";
-            // }
             // Execute the query
             int count = st.executeUpdate(query);
-        } catch (SQLException e) { }
+        } catch (SQLException e) {
+        }
     }
+
+    public void getFilenameWithPopularity(LinkedHashMap<String, Double> fileNamePopularityMap) {
+        try {
+            // Obtain a statement
+            Statement st = connection.createStatement();
+            String query = "SELECT Filename, Popularity FROM CrawlerData WHERE Filename IS NOT NULL";
+            // Execute the query
+            ResultSet rs = st.executeQuery(query);
+            // Store the urls and innerUrl in the Maps
+            while (rs.next()) {
+                String popularityString = rs.getString("Popularity");
+                Double popularity = Double.parseDouble(popularityString);
+                fileNamePopularityMap.put(rs.getString("Filename"), popularity);
+            }
+        } catch (SQLException e) {
+        }
+    }
+
     // END OF RANKER QUERIES
     // Add fileName and score to table "FilesAndScores" and return its id
     // given an originalWordId
@@ -532,6 +553,7 @@ public class DataAccess {
         }
         return -1;
     }
+
     // Get score from table "FilesAndScores"
     // given a fileId
     public double getScore(int fileId) {
@@ -567,9 +589,8 @@ public class DataAccess {
         }
     }
 
-
-    //Increment number of documents in table "StemWords" 
-    //given a stemId
+    // Increment number of documents in table "StemWords"
+    // given a stemId
     public void incrementNumberOfDocuments(int stemId) {
         try {
             // Obtain a statement
@@ -582,8 +603,7 @@ public class DataAccess {
         }
     }
 
-
-    //Get all terms and the number of documents of each term
+    // Get all terms and the number of documents of each term
     public HashMap<Integer, Integer> getAllTermsAndNumberOfDocuments() {
         HashMap<Integer, Integer> termsAndNumberOfDocuments = new HashMap<Integer, Integer>();
         try {
@@ -604,8 +624,8 @@ public class DataAccess {
         }
         return termsAndNumberOfDocuments;
     }
-    
-    //Set IDF in table "StemWords"
+
+    // Set IDF in table "StemWords"
     public void setIDF(int stemId, double IDF) {
         try {
             // Obtain a statement

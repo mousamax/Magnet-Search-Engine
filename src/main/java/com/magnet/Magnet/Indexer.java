@@ -111,6 +111,11 @@ public class Indexer {
         // Loop on title words and add them to the map
         for (String word : titleWords) {
 
+            //Don't consider empty string
+            if (word.equals("")) {
+                continue;
+            }
+
             // Convert word to lowercase
             word = word.toLowerCase();
 
