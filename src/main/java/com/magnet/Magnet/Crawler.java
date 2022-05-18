@@ -168,6 +168,7 @@ public class Crawler implements Runnable {
             if(!langCode.equals("en")) {
                 return false;
             }
+            return true;
         }
         LanguageResult result = detector.detect(doc.body().text().substring(0, Math.min(doc.body().text().length(), 100)));
         if(!result.getLanguage().equals("en")) {

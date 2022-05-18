@@ -41,8 +41,8 @@ Query nvarchar(300) COLLATE Arabic_CI_AI_KS_WS NOT NULL PRIMARY KEY
 CREATE TABLE StemWords(
 Id INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
 StemTerm nvarchar(300) COLLATE Arabic_CI_AI_KS_WS NOT NULL,
-numberOfDocuments int DEFAULT 0,
-IDF nvarchar(5)
+NumDocs int DEFAULT 0,
+IDF nvarchar(15)
 );
 
 CREATE TABLE OriginalWords(
