@@ -15,10 +15,11 @@ public class QueryProcessor{
  
     public static void main(String[] args) throws JSONException, IOException, FileNotFoundException, ParseException, org.json.simple.parser.ParseException  {
         String query = "computer the Universe in engineer department";
-        QueryProcessing(query.toLowerCase());
+        QueryProcessing(query);
     }
     public static ArrayList<String> QueryProcessing(String query) throws IOException, JSONException, org.json.simple.parser.ParseException{
-                //read json file
+        query = query.toLowerCase();
+        //read json file
                 Map<String, Map<String, Map<String, Double>>> mp = new HashMap<String, Map<String, Map<String, Double>>>();
                 //ArrayList<String> files = getHTMLFiles(new File("./"));
                 Set<String> stopWords = loadStopwords();
