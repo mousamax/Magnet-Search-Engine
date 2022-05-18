@@ -242,7 +242,8 @@ public class DataAccess {
         try {
             // Obtain a statement
             Statement st = connection.createStatement();
-            String query = "SELECT FILENAME FROM CrawlerData WHERE INDEXED = 0;";
+            // select all the non-indexed and not null files
+            String query = "SELECT FILENAME FROM CrawlerData WHERE INDEXED = 0 AND FILENAME IS NOT NULL;";
             // Execute the query
             ResultSet rs = st.executeQuery(query);
             while (rs.next()) {
@@ -252,7 +253,16 @@ public class DataAccess {
         }
         return nonIndexedFiles;
     }
-
+    // markFileAsIndexed in the database table "CrawlerData" in column "INDEXED"
+    public void markFileAsIndexed(String filename) {
+        try {
+            // Obtain a statement
+            Statement st = connection.createStatement();
+            String query = "UPDATE CrawlerData SET INDEXED = 1 WHERE FILENAME = N'" + filename + "';";
+            // Execute the query
+            int count = st.executeUpdate(query);
+        } catch (SQLException e) { }
+    }
     //Select all from the database table "SearchData"
     //return in a list
     public ArrayList<String> getQueries() {
