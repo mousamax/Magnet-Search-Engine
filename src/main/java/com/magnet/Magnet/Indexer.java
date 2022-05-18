@@ -32,18 +32,19 @@ public class Indexer {
 
             // Key: Term
             // Value: Map with: Key: filename , Value: Term Frequency
-            //Map<String, Map<String, Double>> mp = new HashMap<String, Map<String, Double>>();
+            // Map<String, Map<String, Double>> mp = new HashMap<String, Map<String,
+            // Double>>();
             ArrayList<String> files = getHTMLFiles(new File("./html_files"));
 
             int numberOfDocuments = files.size();
             System.out.println("\u001B[34m" + "Number of documents: " + numberOfDocuments + "\u001B[0m");
 
             for (String fileName : files) {
-                //mp = readHTMLFile(fileName, stopWords, mp);
+                // mp = readHTMLFile(fileName, stopWords, mp);
                 readHTMLFileDB(fileName, stopWords, dataAccess);
             }
 
-            //writeToFile(convertToJSON(mp).toString(), "index.json");
+            // writeToFile(convertToJSON(mp).toString(), "index.json");
             System.out.println("--------------------------------");
             System.out.println(
                     "\u001B[32m" + "Finished indexing all files\nOutput of the indexer is in the DB"
@@ -114,7 +115,8 @@ public class Indexer {
         return sb.toString();
     }
 
-    public static void readHTMLFileDB(String fileName, Set<String> stopWords, DataAccess dataAccess) throws IOException {
+    public static void readHTMLFileDB(String fileName, Set<String> stopWords, DataAccess dataAccess)
+            throws IOException {
 
         // Define scores for terms in title and in body
         Double titleScore = 2.0;
@@ -123,7 +125,7 @@ public class Indexer {
         File input = new File("./html_files/" + fileName);
         // Use Jsoup to parse the file
         Document doc = Jsoup.parse(input, "UTF-8", "");
-        //Remove .html from the file name
+        // Remove .html from the file name
         fileName = fileName.substring(0, fileName.length() - 5);
         // Save the title in a string
         String title = doc.title();
@@ -150,41 +152,52 @@ public class Indexer {
             // Stemming
             String stemmedWord = stemming(word);
 
-
             // Check if the stemmed term is in the DB
-            if (dataAccess.getStemTermId(stemmedWord) == -1) {
+            // Get the stem id
+            int stemId = dataAccess.getStemTermId(stemmedWord);
+            if (stemId == -1) {
                 // Stemmed Term is not in DB
 
                 // Add the stemmed term to the DB
-                int stemId = dataAccess.addStemTerm(stemmedWord);
+                stemId = dataAccess.addStemTerm(stemmedWord);
 
                 // Add original word to DB
                 int originalWordId = dataAccess.addOriginalWord(word, stemId);
 
                 // Add file to DB
 
-                int fileId = dataAccess.addFile(fileName, titleScore / docLength, originalWordId);
+                dataAccess.addFile(fileName, titleScore / docLength, originalWordId);
+
+                // Increment the number of documents for the stemmed term
+                dataAccess.incrementNumberOfDocuments(stemId);
 
             } else {
-                
-                //Check if the original term is in the DB
-                if (dataAccess.getOriginalWordId(word) == -1) {
+
+                // Stemmed word is in DB
+
+                // Check if the original term is in the DB
+                // Get the original word id
+                int originalWordId = dataAccess.getOriginalWordId(word);
+                if (originalWordId == -1) {
                     // Original Term is not in DB
-                    
-                    //Get the stem id
-                    int stemId = dataAccess.getStemTermId(stemmedWord);
+
+                    // Get the stem id
+                    stemId = dataAccess.getStemTermId(stemmedWord);
 
                     // Add original word to DB
-                    int originalWordId = dataAccess.addOriginalWord(word, stemId);
+                    originalWordId = dataAccess.addOriginalWord(word, stemId);
 
                     // Add file to DB
-                    int fileId = dataAccess.addFile(fileName, titleScore / docLength, originalWordId);
+                    dataAccess.addFile(fileName, titleScore / docLength, originalWordId);
+
+                    // Increment the number of documents for the stemmed term
+                    dataAccess.incrementNumberOfDocuments(stemId);
 
                 } else {
                     // Original Term is in DB
 
                     // Get the original word id
-                    int originalWordId = dataAccess.getOriginalWordId(word);
+                    originalWordId = dataAccess.getOriginalWordId(word);
 
                     // Get the file id
                     int fileId = dataAccess.getFileId(fileName, originalWordId);
@@ -196,6 +209,9 @@ public class Indexer {
                         // Add file to DB
                         fileId = dataAccess.addFile(fileName, titleScore / docLength, originalWordId);
 
+                        // Increment the number of documents for the stemmed term
+                        dataAccess.incrementNumberOfDocuments(stemId);
+
                     } else {
                         // File is in DB
 
@@ -204,15 +220,16 @@ public class Indexer {
 
                         // Update the file TF
                         dataAccess.updateFileScore(fileId, score + titleScore / docLength);
-                    
+
                     }
 
                 }
-                  
+
             }
 
         }
 
+        // Loop on title words and add them to the map
         for (String word : bodyWords) {
 
             // Convert word to lowercase
@@ -226,41 +243,52 @@ public class Indexer {
             // Stemming
             String stemmedWord = stemming(word);
 
-
             // Check if the stemmed term is in the DB
-            if (dataAccess.getStemTermId(stemmedWord) == -1) {
+            // Get the stem id
+            int stemId = dataAccess.getStemTermId(stemmedWord);
+            if (stemId == -1) {
                 // Stemmed Term is not in DB
 
                 // Add the stemmed term to the DB
-                int stemId = dataAccess.addStemTerm(stemmedWord);
+                stemId = dataAccess.addStemTerm(stemmedWord);
 
                 // Add original word to DB
                 int originalWordId = dataAccess.addOriginalWord(word, stemId);
 
                 // Add file to DB
 
-                int fileId = dataAccess.addFile(fileName, bodyScore / docLength, originalWordId);
+                dataAccess.addFile(fileName, bodyScore / docLength, originalWordId);
+
+                // Increment the number of documents for the stemmed term
+                dataAccess.incrementNumberOfDocuments(stemId);
 
             } else {
-                
-                //Check if the original term is in the DB
-                if (dataAccess.getOriginalWordId(word) == -1) {
+
+                // Stemmed word is in DB
+
+                // Check if the original term is in the DB
+                // Get the original word id
+                int originalWordId = dataAccess.getOriginalWordId(word);
+                if (originalWordId == -1) {
                     // Original Term is not in DB
-                    
-                    //Get the stem id
-                    int stemId = dataAccess.getStemTermId(stemmedWord);
+
+                    // Get the stem id
+                    stemId = dataAccess.getStemTermId(stemmedWord);
 
                     // Add original word to DB
-                    int originalWordId = dataAccess.addOriginalWord(word, stemId);
+                    originalWordId = dataAccess.addOriginalWord(word, stemId);
 
                     // Add file to DB
-                    int fileId = dataAccess.addFile(fileName, bodyScore / docLength, originalWordId);
+                    dataAccess.addFile(fileName, bodyScore / docLength, originalWordId);
+
+                    // Increment the number of documents for the stemmed term
+                    dataAccess.incrementNumberOfDocuments(stemId);
 
                 } else {
                     // Original Term is in DB
 
                     // Get the original word id
-                    int originalWordId = dataAccess.getOriginalWordId(word);
+                    originalWordId = dataAccess.getOriginalWordId(word);
 
                     // Get the file id
                     int fileId = dataAccess.getFileId(fileName, originalWordId);
@@ -272,6 +300,9 @@ public class Indexer {
                         // Add file to DB
                         fileId = dataAccess.addFile(fileName, bodyScore / docLength, originalWordId);
 
+                        // Increment the number of documents for the stemmed term
+                        dataAccess.incrementNumberOfDocuments(stemId);
+
                     } else {
                         // File is in DB
 
@@ -280,11 +311,11 @@ public class Indexer {
 
                         // Update the file TF
                         dataAccess.updateFileScore(fileId, score + bodyScore / docLength);
-                    
+
                     }
 
                 }
-                  
+
             }
 
         }
@@ -600,6 +631,25 @@ public class Indexer {
         stopwordsSet.add("-");
 
         return stopwordsSet;
+    }
+
+    public static void calculateIDF_DB(DataAccess dataAccess, int numbeOfDocuments) {
+        // Calculate IDF
+
+        //Get all terms
+        HashMap<Integer, Integer> terms = dataAccess.getAllTermsAndNumberOfDocuments();
+
+        //for each term
+        for (Integer termId: terms.keySet())
+        {
+            
+            //calculate the idf
+            double idf = Math.log10((double)numbeOfDocuments / (double)terms.get(termId));
+
+            //update the idf in the database
+            dataAccess.setIDF(termId, idf);
+        }
+        
     }
 
     public static Map<String, Map<String, Double>> calculateIDF(Map<String, Map<String, Double>> mp,

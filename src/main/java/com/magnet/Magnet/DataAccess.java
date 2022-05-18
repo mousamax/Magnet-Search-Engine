@@ -1,7 +1,7 @@
 package com.magnet.Magnet;
 
 import java.sql.*;
-import java.util.List;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -516,6 +516,58 @@ public class DataAccess {
             e.printStackTrace();
         }
     }
+
+
+    //Increment number of documents in table "StemWords" 
+    //given a stemId
+    public void incrementNumberOfDocuments(int stemId) {
+        try {
+            // Obtain a statement
+            Statement st = connection.createStatement();
+            String query = "UPDATE StemWords SET NumDocs = NumDocs + 1 WHERE Id = " + stemId + ";";
+            // Execute the query
+            int count = st.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    //Get all terms and the number of documents of each term
+    public HashMap<Integer, Integer> getAllTermsAndNumberOfDocuments() {
+        HashMap<Integer, Integer> termsAndNumberOfDocuments = new HashMap<Integer, Integer>();
+        try {
+            // Obtain a statement
+            Statement st = connection.createStatement();
+            String query = "SELECT Id, NumDocs FROM StemWords;";
+            // Execute the query
+            ResultSet rs = st.executeQuery(query);
+            // Store the compactPages in the ConcurrentHashMap
+            while (rs.next()) {
+                // remove spaces from the url
+                int termId = rs.getInt("Id");
+                int numDocs = rs.getInt("NumDocs");
+                termsAndNumberOfDocuments.put(termId, numDocs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return termsAndNumberOfDocuments;
+    }
+    
+    //Set IDF in table "StemWords"
+    public void setIDF(int stemId, double IDF) {
+        try {
+            // Obtain a statement
+            Statement st = connection.createStatement();
+            String query = "UPDATE StemWords SET IDF = " + IDF + " WHERE Id = " + stemId + ";";
+            // Execute the query
+            int count = st.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     // close the connection
     public void close() {
         try {
