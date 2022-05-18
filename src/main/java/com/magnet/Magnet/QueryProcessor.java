@@ -4,6 +4,8 @@ import com.magnet.Magnet.Ranker.RankerRelevance;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.tartarus.snowball.ext.PorterStemmer;
 
 import java.io.*;
@@ -30,7 +32,7 @@ public class QueryProcessor{
                 
             
                 //------------------phrase searching-------------------------------------
-                //Map<String, Map<String, Map<String, Double>>> phraseSearchingMap = new HashMap<String, Map<String, Map<String, Double>>>();
+                Map<String, Map<String, Map<String, Double>>> phraseSearchingMap = new HashMap<String, Map<String, Map<String, Double>>>();
                
 
                 //------------------end phrase searching-------------------------------------
@@ -92,26 +94,36 @@ public class QueryProcessor{
 
                     }
                 }
-                for(Map.Entry<String, Integer> HTMLdoc : DocumentsContainingPhrase.entrySet())
-                {
-                    if(HTMLdoc.getValue() != queryArrayStemmed.size())
+
+                for(int i = 0; i < queryArrayStemmed.size();i++){
+                    Map<String, Double> temp = new HashMap<String, Double>();
+                    Map<String, Map<String, Double>> temp2 = new HashMap<String, Map<String, Double>>();
+                    temp2.put(originalQueryArray.get(i),temp);
+                    phraseSearchingMap.put(queryArrayStemmed.get(i), temp2);
+                    for(Map.Entry<String, Integer> HTMLdoc : DocumentsContainingPhrase.entrySet())
                     {
-                        //files.add(HTMLdoc.getKey());
-                        // for(int i = 0; i < queryArrayStemmed.size();i++){
-                        //     // Map<String, Map<String, Double>> temp = new HashMap<String, Map<String, Double>>();
-                        //     // temp = processedMap.get(queryArrayStemmed.get(i));
-                            
-                        //     // temp.replace(HTMLdoc, temp.get(HTMLdoc));
-                        //     // phraseSearchingMap.put(queryArrayStemmed.get(i), mp.get(queryArrayStemmed.get(i)));
-                        // }
-                        
-                        DocumentsContainingPhrase.remove(HTMLdoc.getKey());
+                        if(HTMLdoc.getValue() == queryArrayStemmed.size())
+                        {
+                            // Read file from given filename
+                            File input = new File("./html_files/" + HTMLdoc.getKey() + ".html");
+                            // Use Jsoup to parse the file
+                            Document doc = Jsoup.parse(input, "UTF-8", "");
+                            System.out.println(doc.body().text().equals(query));
+                            if(doc.body().text().contains(query) || doc.title().contains(query)){
+
+                                Double val = mp.get(queryArrayStemmed.get(i)).get(originalQueryArray.get(i)).get(HTMLdoc.getKey());
+                                phraseSearchingMap.get(queryArrayStemmed.get(i)).get(originalQueryArray.get(i)).put(HTMLdoc.getKey(), val);
+                            }
+                        }
                     }
                 }
                 
                 System.out.println(processedMap);
                 System.out.println(DocumentsContainingPhrase);
                 System.out.println(HTMLdocuments_scores);
+                System.out.println(phraseSearchingMap);
+
+
                 //writeToFile(convertToJSON(processedMap).toString(), "processed.json");
                //call ranker
         return RankerRelevance.relevanceRanking(processedMap);
