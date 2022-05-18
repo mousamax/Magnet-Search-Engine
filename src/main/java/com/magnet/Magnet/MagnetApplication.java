@@ -37,26 +37,9 @@ public class MagnetApplication {
 		dataAccess.addQuery(query);
 		//Get all queries
 		ArrayList<String> pastQueries = dataAccess.getQueries();
-		
-
 		// TODO send query to query processor
 		ArrayList<String> fileNames = QueryProcessor.QueryProcessing(query);
 		// query processor return list of urls or filenames
-		fileNames.add("00");
-		fileNames.add("10");
-		fileNames.add("20");
-		fileNames.add("26");
-		fileNames.add("83");
-		fileNames.add("150");
-		fileNames.add("160");
-		fileNames.add("120");
-		fileNames.add("692");
-		fileNames.add("711");
-		fileNames.add("771");
-		fileNames.add("875");
-		fileNames.add("913");
-		fileNames.add("200");
-		fileNames.add("140");
 		// TODO parse list of filenames to list of magnet links
 		ArrayList<SearchResult> results = new ArrayList<>();
 		SearchController searchController = new SearchController();

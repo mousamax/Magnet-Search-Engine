@@ -30,7 +30,7 @@ public class QueryProcessor{
                 Map<String, Map<String, Map<String, Double>>> processedMap = new HashMap<String, Map<String, Map<String, Double>>>();
         
 
-                System.out.println(query);
+                //System.out.println(query);
                 //each word in original query splitted 
                 String[] queryArray = query.split(" ");
                 //each word in original query after stemming and removing stop words
@@ -45,7 +45,7 @@ public class QueryProcessor{
                         originalQueryArray.add(queryArray[i]);
                     }   
                 }
-                System.out.println(queryArrayStemmed);
+                //System.out.println(queryArrayStemmed);
 
                 ArrayList<String> files = new ArrayList<String>();
                 for(Map.Entry<String, Map<String, Map<String, Double>>> entry : mp.entrySet()){
@@ -59,16 +59,16 @@ public class QueryProcessor{
                                 for(Map.Entry<String, Double> HTMLdoc : originalWord.getValue().entrySet())
                                 {
                                     files.add(HTMLdoc.getKey());
-                                    processedMap.get(entry.getKey()).get(originalWord.getKey()).replace(HTMLdoc.getKey(), HTMLdoc.getValue() + 20);
+                                    double val = 0.2;
+                                    processedMap.get(entry.getKey()).get(originalWord.getKey()).replace(HTMLdoc.getKey(), HTMLdoc.getValue() + val);
                                 }
                             }
                         }
                         //System.out.println(entry.getKey());
                         //System.out.println(entry.getValue());
-                        
                     } 
                 }
-                System.out.println(processedMap);
+                //System.out.println(processedMap);
                 
         
                 writeToFile(convertToJSON(processedMap).toString(), "processed.json");
@@ -88,7 +88,7 @@ public class QueryProcessor{
         Map<String, Map<String, Map<String, Double>>> processedMap = new HashMap<String, Map<String, Map<String, Double>>>();
 
 
-        System.out.println(query);
+        //System.out.println(query);
         //each word in original query splitted 
         String[] queryArray = query.split(" ");
         //each word in original query after stemming and removing stop words
@@ -103,7 +103,7 @@ public class QueryProcessor{
                 originalQueryArray.add(queryArray[i]);
             }   
         }
-        System.out.println(queryArrayStemmed);
+        //System.out.println(queryArrayStemmed);
 
 
         for(Map.Entry<String, Map<String, Map<String, Double>>> entry : mp.entrySet()){
@@ -125,7 +125,7 @@ public class QueryProcessor{
                 
             } 
         }
-        System.out.println(processedMap);
+        //System.out.println(processedMap);
         
 
         writeToFile(convertToJSON(processedMap).toString(), "processed.json");

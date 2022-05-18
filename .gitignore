@@ -59,3 +59,4 @@ build/
 
 ### VS Code ###
 .vscode/
+indexer result/index.json
