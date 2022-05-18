@@ -418,6 +418,23 @@ public class DataAccess {
         }
     }
 
+
+    //Increment number of documents in table "StemWords" 
+    //given a stemId
+    public void incrementNumberOfDocuments(int stemId) {
+        try {
+            // Obtain a statement
+            Statement st = connection.createStatement();
+            String query = "UPDATE StemWords SET NumDocs = NumDocs + 1 WHERE Id = " + stemId + ";";
+            // Execute the query
+            int count = st.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
     // close the connection
     public void close() {
         try {
