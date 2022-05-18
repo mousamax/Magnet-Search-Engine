@@ -91,7 +91,7 @@ public class Indexer {
         Double titleScore = 2.0;
         Double bodyScore = 1.0;
         // Read file from given filename
-        File input = new File("./html_files/" + fileName);
+        File input = new File("./html_files/" + fileName + ".html");
         // Use Jsoup to parse the file
         Document doc = Jsoup.parse(input, "UTF-8", "");
         // Save the title in a string
