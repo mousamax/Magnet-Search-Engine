@@ -82,7 +82,7 @@ public class QueryProcessor{
                                     {
                                         HTMLdocuments_scores.put(HTMLdoc.getKey(), HTMLdoc.getValue());
                                     }
-                                    //processedMap.get(queryArrayStemmed.get(i)).get(originalQueryArray.get(i)).replace(HTMLdoc.getKey(), HTMLdoc.getValue() + 20);
+                                    processedMap.get(queryArrayStemmed.get(i)).get(originalQueryArray.get(i)).replace(HTMLdoc.getKey(), HTMLdoc.getValue() + 0.500);
                                 }
                         }
                         // for(int j = 0; j < originalQueryArray.size();j++){
@@ -110,7 +110,7 @@ public class QueryProcessor{
                 
                 System.out.println(processedMap);
                 System.out.println(DocumentsContainingPhrase);
-        
+                System.out.println(HTMLdocuments_scores);
                 //writeToFile(convertToJSON(processedMap).toString(), "processed.json");
                
                 return files;
