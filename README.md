@@ -1,6 +1,10 @@
 # Magnet-Search-Engine
  Magnet is a search engine. <br/>
  It contains results from over 5000 pages on the web
+ The search engine demonstrates the main features of a search engine:
+  - web crawling
+  - indexing
+  - ranking 
  
  # How to run the project
  1- install and unzip project folder<br/>
